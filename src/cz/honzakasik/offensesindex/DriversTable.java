@@ -1,10 +1,15 @@
+package cz.honzakasik.offensesindex;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
+
+import static cz.honzakasik.offensesindex.DatabaseNames.*;
 
 /**
  * Created by Jan Kasik on 28.10.15.
@@ -43,11 +48,11 @@ public class DriversTable {
         try {
             while (result != null && result.next()) {
                 data.add(new DriverTableItem(
-                        result.getString("jmeno"),
-                        result.getString("prijmeni"),
-                        result.getInt("pocet_bodu"),
-                        result.getInt("pocet_prestupku"),
-                        result.getString("mesto")
+                    result.getString(NAME),
+                    result.getString(SURNAME),
+                    result.getInt(POINT_COUNT),
+                    result.getInt(OFFENSES_COUNT),
+                    result.getString(CITY)
                 ));
             }
         } catch (SQLException e) {
