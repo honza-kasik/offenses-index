@@ -22,8 +22,6 @@ public class DBManager {
                 createDriversTable();
             if (!isTableReady(EVENTS))
                 createEventsTable();
-            boolean bla = isTableReady(EVENTS);
-            if (bla == true) bla = true;
             if (!isTableReady(OFFENSES))
                 createOffensesTable();
             if (!isTableReady(DEPARTMENTS))
@@ -44,14 +42,15 @@ public class DBManager {
     }
 
     public ResultSet getDriversFromTo(LocalDate[] dates) {
-        return executeSQL(getDriverQuery(   " AND " + EVENTS + "." + DATE + ">=" + dates[0] +
-                                            " AND " + EVENTS + "." + DATE + "<=" + dates[1]));
+        /*return executeSQL(getDriverQuery(   " AND \"" + dot(EVENTS, DATE) + "\">='" + dates[0] + "'" +
+                                            " AND \"" + dot(EVENTS, DATE) + "\"<='" + dates[1] + "'"));*/
+        return executeSQL(getDriverQuery(""));
     }
 
     private ResultSet executeSQL(String SQL) {
         try {
-            Statement statement = connection.createStatement();
-            logger.log(Level.WARNING, "Executing: " + SQL);
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            logger.log(Level.INFO, "Executing: " + SQL);
             statement.execute(SQL);
             return statement.getResultSet();
         } catch (SQLException e) {
@@ -62,7 +61,7 @@ public class DBManager {
 
     public boolean isResultEmpty(ResultSet result) {
         try {
-            return !result.isBeforeFirst();
+            return !result.first();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -72,21 +71,21 @@ public class DBManager {
     private String getDriverQuery(String condition) {
         return  "SELECT count(\"" + dot(EVENTS, ID) +  "\") AS \"" + OFFENSES_COUNT + "\"," + "\n" +
                     "sum(\"" + dot(OFFENSES, POINT_COUNT) + "\") as \"" + POINT_COUNT + "\"," + "\n" +
-                    "\"" + dot(DRIVERS, NAME) + "\" AS \"c" + NAME + "\"," + "\n" +
-                    "\"" + dot(DRIVERS, SURNAME) + "\" AS \"c" + SURNAME + "\"," + "\n" +
-                    "\"" + dot(DRIVERS, CITY) + "\" AS \"c" + CITY + "\"\n" +
+                    "\"" + dot(DRIVERS, NAME) + "\"," + "\n" +
+                    "\"" + dot(DRIVERS, SURNAME) + "\"," + "\n" +
+                    "\"" + dot(DRIVERS, CITY) + "\"\n" +
                     "FROM \"" + EVENTS + "\"\n" +
                     "JOIN \"" + DRIVERS + "\" ON \"" + dot(EVENTS, DRIVER_ID) + "\" = \"" + dot(DRIVERS, ID) + "\"\n" +
                         condition + "\n" +
                     "JOIN \"" + OFFENSES + "\" ON \"" + dot(EVENTS, OFFENSE_ID) + "\" = \"" + dot(OFFENSES, ID) + "\"\n" +
-                    "GROUP BY \"c" + NAME + "\", \"c" + SURNAME + "\", \"c" + CITY + "\"";
+                    "GROUP BY \"" + dot(DRIVERS, NAME) + "\", \"" + dot(DRIVERS, SURNAME) + "\", \"" + dot(DRIVERS, CITY) + "\"";
     }
 
     private void createDriversTable() {
         executeSQL("CREATE TABLE \"" + DRIVERS + "\"(" +
                 "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
-                "\"" + NAME + "\" VARCHAR(2) NOT NULL," +
-                "\"" + SURNAME + "\" VARCHAR(2) NOT NULL," +
+                "\"" + NAME + "\" VARCHAR(20) NOT NULL," +
+                "\"" + SURNAME + "\" VARCHAR(20) NOT NULL," +
                 "\"" + DATE_OF_BIRTH + "\" DATE NOT NULL," +
                 "\"" + SEX + "\" VARCHAR(10) NOT NULL," +
                 "\"" + CITY + "\" VARCHAR(20) NOT NULL," +
@@ -116,14 +115,14 @@ public class DBManager {
         executeSQL("CREATE TABLE \"" + DEPARTMENTS + "\"(" +
                 "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
                 "\"" + NAME + "\" VARCHAR(100) NOT NULL," +
-                "\"" + CITY + "\" VARCHAR(2) NOT NULL)");
+                "\"" + CITY + "\" VARCHAR(40) NOT NULL)");
     }
 
     private void createOffensesTable() {
         executeSQL("CREATE TABLE \"" + OFFENSES + "\"(" +
                 "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
                 "\"" + POINT_COUNT + "\" NUMERIC(2) NOT NULL," +
-                "\"" + NAME + "\" VARCHAR(2) NOT NULL)");
+                "\"" + NAME + "\" VARCHAR(100) NOT NULL)");
     }
 
     private boolean isTableReady(String table) {
