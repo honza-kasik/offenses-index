@@ -1,4 +1,11 @@
 *.class
+out/*
+prestupky_db/*
+*.log
+
+#IDEA
+.idea/*
+*.iml
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
