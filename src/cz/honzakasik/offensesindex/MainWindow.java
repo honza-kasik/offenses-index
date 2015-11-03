@@ -76,12 +76,14 @@ public class MainWindow extends Application {
 
         stage.setTitle("Přestupky řidičů");
         stage.setScene(scene);
-        controller.initialize(dates);
+        stage.setOnShown(e -> controller.initialize(dates));
+
 
         stage.setOnHidden(e -> {
 
         });
         stage.showAndWait();
+
     }
 
     public void displayPoliceDepartmentsOrderedByOffenses(ActionEvent actionEvent) {

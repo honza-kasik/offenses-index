@@ -37,14 +37,14 @@ public class DBManager {
         return executeSQL(getDriverQuery(""));
     }
 
-    public ResultSet getDriversFromCity(String city) {
-        return executeSQL(getDriverQuery(" AND " + DRIVERS + "." + CITY + "=" + city));
+    public ResultSet getDriversWhoLostLicenseFromCity(String city) {
+        return executeSQL(getDriverQuery(   " AND " + dot(DRIVERS, CITY) + "=" + city +
+                                            " AND " + POINT_COUNT + ">=12"));
     }
 
     public ResultSet getDriversFromTo(LocalDate[] dates) {
-        /*return executeSQL(getDriverQuery(   " AND \"" + dot(EVENTS, DATE) + "\">='" + dates[0] + "'" +
-                                            " AND \"" + dot(EVENTS, DATE) + "\"<='" + dates[1] + "'"));*/
-        return executeSQL(getDriverQuery(""));
+        return executeSQL(getDriverQuery(   " AND \"" + dot(EVENTS, DATE) + "\">='" + dates[0] + "'" +
+                                            " AND \"" + dot(EVENTS, DATE) + "\"<='" + dates[1] + "'"));
     }
 
     private ResultSet executeSQL(String SQL) {
@@ -123,6 +123,10 @@ public class DBManager {
                 "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
                 "\"" + POINT_COUNT + "\" NUMERIC(2) NOT NULL," +
                 "\"" + NAME + "\" VARCHAR(100) NOT NULL)");
+    }
+
+    public ResultSet getAllCities() {
+        return executeSQL("SELECT DISTINCT " + CITY + " FROM " + DRIVERS);//TODO create dialog with choicebox
     }
 
     private boolean isTableReady(String table) {

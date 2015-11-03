@@ -1,6 +1,7 @@
 package cz.honzakasik.offensesindex;
 
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -11,16 +12,16 @@ public class DriverTableItem {
 
     private StringProperty name = new SimpleStringProperty();
     private StringProperty surname = new SimpleStringProperty();
-    private IntegerProperty pointCount;
-    private StringProperty city = new SimpleStringProperty();
-    private IntegerProperty offenseCount;
+    private IntegerProperty pointCount = new SimpleIntegerProperty();
+    private StringProperty address = new SimpleStringProperty();
+    private IntegerProperty offenseCount = new SimpleIntegerProperty();
 
     public DriverTableItem(StringProperty name, StringProperty surname, IntegerProperty pointCount, IntegerProperty offensesCount, StringProperty city) {
         this.name = name;
         this.surname = surname;
         this.pointCount = pointCount;
         this.offenseCount = offensesCount;
-        this.city = city;
+        this.address = city;
     }
 
     public DriverTableItem(String name, String surname, Integer pointCount, Integer offenseCount, String city) {
@@ -28,7 +29,7 @@ public class DriverTableItem {
         setSurname(surname);
         setPointCount(pointCount);
         setOffenseCount(offenseCount);
-        setCity(city);
+        setAddress(city);
     }
 
     public int getOffenseCount() {
@@ -79,15 +80,15 @@ public class DriverTableItem {
         this.pointCount.set(pointCount);
     }
 
-    public String getCity() {
-        return city.get();
+    public String getAddress() {
+        return address.get();
     }
 
-    public StringProperty cityProperty() {
-        return city;
+    public StringProperty addressProperty() {
+        return address;
     }
 
-    public void setCity(String city) {
-        this.city.set(city);
+    public void setAddress(String address) {
+        this.address.set(address);
     }
 }

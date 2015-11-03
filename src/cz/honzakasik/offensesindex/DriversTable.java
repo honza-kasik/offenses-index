@@ -22,7 +22,7 @@ public class DriversTable {
 
     public void initialize() {
         ResultSet result = DBManager.getDrivers();
-        driversTable.setItems(fillTableData(result));
+        driversTable.setItems(createTableData(result));
     }
 
     public void initialize(String city) {
@@ -30,8 +30,8 @@ public class DriversTable {
     }
 
     private void fillTableWithDriversFromCity(String city) {
-        ResultSet result = DBManager.getDriversFromCity(city);
-        driversTable.setItems(fillTableData(result));
+        ResultSet result = DBManager.getDriversWhoLostLicenseFromCity(city);
+        driversTable.setItems(createTableData(result));
     }
 
     public void initialize(LocalDate[] dates) {
@@ -40,20 +40,20 @@ public class DriversTable {
 
     private void fillTableWithFromToDatesResult(LocalDate[] dates) {
         ResultSet result = DBManager.getDriversFromTo(dates);
-        driversTable.setItems(fillTableData(result));
+        driversTable.setItems(createTableData(result));
     }
 
-    private ObservableList<DriverTableItem> fillTableData(ResultSet result) {
-        ObservableList<DriverTableItem> data = FXCollections.emptyObservableList();
+    private ObservableList<DriverTableItem> createTableData(ResultSet result) {
+        ObservableList<DriverTableItem> data = FXCollections.observableArrayList();
         try {
             while (result != null && result.next()) {
-                data.add(new DriverTableItem(
-                    result.getString(NAME),
-                    result.getString(SURNAME),
-                    result.getInt(POINT_COUNT),
-                    result.getInt(OFFENSES_COUNT),
-                    result.getString(CITY)
-                ));
+                 DriverTableItem driverTableItem = new DriverTableItem(
+                        result.getString(NAME),
+                        result.getString(SURNAME),
+                        result.getInt(POINT_COUNT),
+                        result.getInt(OFFENSES_COUNT),
+                        result.getString(CITY));
+                data.add(driverTableItem);
             }
         } catch (SQLException e) {
             e.printStackTrace();
