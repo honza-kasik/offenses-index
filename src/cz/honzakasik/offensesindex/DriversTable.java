@@ -18,10 +18,10 @@ public class DriversTable {
 
     @FXML private TableView<DriverTableItem> driversTable;
 
-    private Dispatcher dispatcher = new Dispatcher();
+    private DBManager DBManager = new DBManager();
 
     public void initialize() {
-        ResultSet result = dispatcher.getDrivers();
+        ResultSet result = DBManager.getDrivers();
         driversTable.setItems(fillTableData(result));
     }
 
@@ -30,7 +30,7 @@ public class DriversTable {
     }
 
     private void fillTableWithDriversFromCity(String city) {
-        ResultSet result = dispatcher.getDriversFromCity(city);
+        ResultSet result = DBManager.getDriversFromCity(city);
         driversTable.setItems(fillTableData(result));
     }
 
@@ -39,7 +39,7 @@ public class DriversTable {
     }
 
     private void fillTableWithFromToDatesResult(LocalDate[] dates) {
-        ResultSet result = dispatcher.getDriversFromTo(dates);
+        ResultSet result = DBManager.getDriversFromTo(dates);
         driversTable.setItems(fillTableData(result));
     }
 

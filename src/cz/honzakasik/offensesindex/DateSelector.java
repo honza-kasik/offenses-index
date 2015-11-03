@@ -30,8 +30,8 @@ public class DateSelector implements Initializable {
     }
 
     public void confirmButtonAction() {
-        Dispatcher dispatcher = new Dispatcher();
-        if (dispatcher.isResultEmpty(dispatcher.getDriversFromTo(getDates()))) {
+        DBManager DBManager = new DBManager();
+        if (DBManager.isResultEmpty(DBManager.getDriversFromTo(getDates()))) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Nebyly nalezeny žádné výsledky");
             alert.setHeaderText("Pro zadané parametry nebyly nalezeny žádné výsledky!");

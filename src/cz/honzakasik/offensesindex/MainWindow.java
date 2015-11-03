@@ -25,7 +25,7 @@ public class MainWindow extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        Parent root = FXMLLoader.load(getClass().getResource("cz/honzakasik/offensesindex/mainWindows.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("mainWindows.fxml"));
         primaryStage.setTitle("Evidence přestupků");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
@@ -38,7 +38,7 @@ public class MainWindow extends Application {
     }
 
     public void displayDateSelector(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("cz/honzakasik/offensesindex/selectDateSection.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("selectDateSection.fxml"));
         Parent root = loader.load();
 
         DateSelector controller = loader.getController();
@@ -64,7 +64,7 @@ public class MainWindow extends Application {
     }
 
     private void showDriversTable(LocalDate[] dates) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("cz/honzakasik/offensesindex/driversTable.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("driversTable.fxml"));
         Parent root = loader.load();
 
         DriversTable controller = loader.getController();
@@ -88,7 +88,7 @@ public class MainWindow extends Application {
     }
 
     public void displayDriversWhoLostLicense(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("cz/honzakasik/offensesindex/driversTable.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("driversTable.fxml"));
         Parent root = loader.load();
 
         DriversTable controller = loader.getController();
