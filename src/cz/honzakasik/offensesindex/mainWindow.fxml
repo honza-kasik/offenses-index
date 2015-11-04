@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.cell.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.honzakasik.offensesindex.MainWindow">
+   <center>
+      <TabPane prefHeight="470.0" prefWidth="718.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab text="Drivers">
+               <content>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <center>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
+                           <content>
+                              <TableView fx:id="driversTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                <columns>
+                                    <TableColumn id="driverSurname" fx:id="surname" prefWidth="75.0" text="Příjmení">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="surname" />
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn id="driverName" fx:id="name" prefWidth="75.0" text="Jméno">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="name" />
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn id="driverAddress" fx:id="address" prefWidth="75.0" text="Bydliště">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="address" />
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn fx:id="offenseCount" prefWidth="75.0" text="Přestupky">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="offenseCount" />
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn prefWidth="75.0" text="Počet bodů">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="pointCount" />
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </content>
+                        </ScrollPane>
+                     </center>
+                     <top>
+                        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                          <items>
+                              <MenuButton text="View">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" onAction="#displayDateSelector" text="Offenses within period" />
+                                    <CustomMenuItem mnemonicParsing="false" text="Unspecified Action">
+                                      <content>
+                                        <CheckBox fx:id="lostLicenseSwitch" onAction="#displayDriversWhoLostLicenseSwitch" text="Only without license" />
+                                      </content>
+                                    </CustomMenuItem>
+                                </items>
+                              </MenuButton>
+                              <Button mnemonicParsing="false" onAction="#addDriverAction" text="Add driver" />
+                          </items>
+                        </ToolBar>
+                     </top>
+                  </BorderPane>
+               </content>
+          </Tab>
+            <Tab text="Departments">
+               <content>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <center>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
+                           <content>
+                              <TableView fx:id="departmentsTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                <columns>
+                                  <TableColumn prefWidth="75.0" text="Name" />
+                                  <TableColumn prefWidth="75.0" text="Location" />
+                                    <TableColumn prefWidth="75.0" text="Offenses count" />
+                                    <TableColumn prefWidth="75.0" text="Year" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </content>
+                        </ScrollPane>
+                     </center>
+                     <top>
+                        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                          <items>
+                              <Label text="Year:" />
+                              <TextField />
+                              <Separator layoutX="50.0" layoutY="10.0" opacity="0.0" orientation="VERTICAL" />
+                          </items>
+                        </ToolBar>
+                     </top>
+                  </BorderPane>
+               </content>
+            </Tab>
+          <Tab onSelectionChanged="#loadActualInformation" text="Policemen">
+               <content>
+                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Text fx:id="textPlaceHolder" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+                           <HBox.margin>
+                              <Insets top="40.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </HBox>
+               </content>
+          </Tab>
+            <Tab onSelectionChanged="#loadActualInformation" text="Offenses" />
+        </tabs>
+      </TabPane>
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>
