@@ -38,13 +38,13 @@ public class DBManager {
     }
 
     public ResultSet getDriversWhoLostLicenseFromCity(String city) {
-        return executeSQL(getDriverQuery(   " AND " + dot(DRIVERS, CITY) + "=" + city +
-                                            " AND " + POINT_COUNT + ">=12"));
+        return executeSQL(getDriverQuery(   " AND (\"" + POINT_COUNT + "\">11" +
+                                            " AND \"" + dot(DRIVERS, CITY) + "\"='" + city + "')"));
     }
 
     public ResultSet getDriversFromTo(LocalDate[] dates) {
-        return executeSQL(getDriverQuery(   " AND \"" + dot(EVENTS, DATE) + "\">='" + dates[0] + "'" +
-                                            " AND \"" + dot(EVENTS, DATE) + "\"<='" + dates[1] + "'"));
+        return executeSQL(getDriverQuery(   "̈́\tAND \"" + dot(EVENTS, DATE) + "\">='" + dates[0] + "'\n" +
+                                            "\tAND \"" + dot(EVENTS, DATE) + "\"<='" + dates[1] + "'"));
     }
 
     private ResultSet executeSQL(String SQL) {
@@ -71,14 +71,15 @@ public class DBManager {
     private String getDriverQuery(String condition) {
         return  "SELECT count(\"" + dot(EVENTS, ID) +  "\") AS \"" + OFFENSES_COUNT + "\"," + "\n" +
                     "sum(\"" + dot(OFFENSES, POINT_COUNT) + "\") as \"" + POINT_COUNT + "\"," + "\n" +
-                    "\"" + dot(DRIVERS, NAME) + "\"," + "\n" +
-                    "\"" + dot(DRIVERS, SURNAME) + "\"," + "\n" +
-                    "\"" + dot(DRIVERS, CITY) + "\"\n" +
+                    "\"" + dot(DRIVERS, NAME) + "\",\n" +
+                    "\"" + dot(DRIVERS, SURNAME) + "\",\n" +
+                    "\"" + dot(DRIVERS, CITY) + "\",\n" +
+                    "\"" + dot(DRIVERS, ID) + "\"\n" +
                     "FROM \"" + EVENTS + "\"\n" +
                     "JOIN \"" + DRIVERS + "\" ON \"" + dot(EVENTS, DRIVER_ID) + "\" = \"" + dot(DRIVERS, ID) + "\"\n" +
-                        condition + "\n" +
+                    condition + (condition.isEmpty() ? "" : "\n") +
                     "JOIN \"" + OFFENSES + "\" ON \"" + dot(EVENTS, OFFENSE_ID) + "\" = \"" + dot(OFFENSES, ID) + "\"\n" +
-                    "GROUP BY \"" + dot(DRIVERS, NAME) + "\", \"" + dot(DRIVERS, SURNAME) + "\", \"" + dot(DRIVERS, CITY) + "\"";
+                    "GROUP BY \"" + dot(DRIVERS, ID) + "\", \"" + dot(DRIVERS, NAME) + "\", \"" + dot(DRIVERS, SURNAME) + "\", \"" + dot(DRIVERS, CITY) + "\"";
     }
 
     private void createDriversTable() {
@@ -126,7 +127,7 @@ public class DBManager {
     }
 
     public ResultSet getAllCities() {
-        return executeSQL("SELECT DISTINCT " + CITY + " FROM " + DRIVERS);//TODO create dialog with choicebox
+        return executeSQL("SELECT DISTINCT \"" + CITY + "\" FROM \"" + DRIVERS + "\"");
     }
 
     private boolean isTableReady(String table) {

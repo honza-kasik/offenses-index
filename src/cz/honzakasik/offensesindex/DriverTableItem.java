@@ -15,6 +15,7 @@ public class DriverTableItem {
     private IntegerProperty pointCount = new SimpleIntegerProperty();
     private StringProperty address = new SimpleStringProperty();
     private IntegerProperty offenseCount = new SimpleIntegerProperty();
+    private IntegerProperty id = new SimpleIntegerProperty();
 
     public DriverTableItem(StringProperty name, StringProperty surname, IntegerProperty pointCount, IntegerProperty offensesCount, StringProperty city) {
         this.name = name;
@@ -24,12 +25,25 @@ public class DriverTableItem {
         this.address = city;
     }
 
-    public DriverTableItem(String name, String surname, Integer pointCount, Integer offenseCount, String city) {
+    public DriverTableItem(String name, String surname, Integer pointCount, Integer offenseCount, String city, Integer id) {
         setName(name);
         setSurname(surname);
         setPointCount(pointCount);
         setOffenseCount(offenseCount);
         setAddress(city);
+        setId(id);
+    }
+
+    public int getId() {
+        return id.get();
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id.set(id);
     }
 
     public int getOffenseCount() {
