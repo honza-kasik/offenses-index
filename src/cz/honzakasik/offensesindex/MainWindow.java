@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
@@ -65,36 +64,6 @@ public class MainWindow extends Application implements Initializable {
                 driversTable.setItems(Helper.transformDriverTableData(dbManager.getDriversFromTo(controller.getDates())));
             });
         stage.showAndWait();
-    }
-
-    public void displayPoliceDepartmentsOrderedByOffenses(ActionEvent actionEvent) {
-    }
-
-    public void displayDriversWhoLostLicense(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("driversTable.fxml"));
-        Parent root = loader.load();
-
-        DriversTable controller = loader.getController();
-        Scene scene = new Scene(root);
-
-        Stage stage = new Stage();
-        stage.initOwner(primaryStage);
-        stage.initModality(Modality.WINDOW_MODAL);
-
-        stage.setTitle("Přestupky řidičů");
-        stage.setScene(scene);
-        controller.initialize();
-
-        stage.showAndWait();
-    }
-
-    public void displayWorstAndBestPoliceman(ActionEvent actionEvent) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information Dialog");
-        alert.setHeaderText(null);
-        alert.setContentText("I have a great message for you!");
-
-        alert.showAndWait();
     }
 
     public void loadActualInformation(Event event) {
