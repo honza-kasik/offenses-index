@@ -1,5 +1,10 @@
 package cz.honzakasik.offensesindex;
 
+import com.healthmarketscience.sqlbuilder.*;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.logging.Level;
@@ -12,39 +17,49 @@ import static cz.honzakasik.offensesindex.DatabaseNames.*;
 public class DBManager {
 
     private Connection connection;
+    private DbSpec spec = new DbSpec();
+    private DbSchema schema = spec.addDefaultSchema();
+    private DbTable offensesTable;
+    private DbTable driversTable;
+    private DbTable policemenTable;
+    private DbTable eventsTable;
+    private DbTable departmentsTable;
     private Logger logger = Logger.getLogger(DBManager.class.getName());
 
     public DBManager() {
+        initializeTables();
         String url = "jdbc:derby:prestupky_db;create=true";
         try {
             this.connection = DriverManager.getConnection(url);
             if (!isTableReady(DRIVERS))
-                createDriversTable();
+                createTable(driversTable);
             if (!isTableReady(EVENTS))
-                createEventsTable();
+                createTable(eventsTable);
             if (!isTableReady(OFFENSES))
-                createOffensesTable();
+                createTable(offensesTable);
             if (!isTableReady(DEPARTMENTS))
-                createPoliceDepartmentsTable();
+                createTable(departmentsTable);
             if (!isTableReady(POLICEMEN))
-                createPolicemenTable();
+                createTable(policemenTable);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public ResultSet getDrivers() {
-        return executeSQL(getDriverQuery(""));
+        return executeSQL(getDriverQuery(BinaryCondition.EMPTY));
     }
 
     public ResultSet getDriversWhoLostLicenseFromCity(String city) {
-        return executeSQL(getDriverQuery(   " AND (\"" + POINT_COUNT + "\">11" +
-                                            " AND \"" + dot(DRIVERS, CITY) + "\"='" + city + "')"));
+        return executeSQL(getDriverQuery(
+                ComboCondition.and(BinaryCondition.greaterThan(POINT_COUNT, 12, true),
+                                    BinaryCondition.equalTo(driversTable.findColumn(CITY), city))));
     }
 
     public ResultSet getDriversFromTo(LocalDate[] dates) {
-        return executeSQL(getDriverQuery(   "̈́\tAND \"" + dot(EVENTS, DATE) + "\">='" + dates[0] + "'\n" +
-                                            "\tAND \"" + dot(EVENTS, DATE) + "\"<='" + dates[1] + "'"));
+        return executeSQL(getDriverQuery(
+                ComboCondition.and(BinaryCondition.greaterThan(eventsTable.findColumn(DATE), dates[0], true),
+                                    BinaryCondition.lessThan(eventsTable.findColumn(DATE), dates[1], true))));
     }
 
     private ResultSet executeSQL(String SQL) {
@@ -68,72 +83,93 @@ public class DBManager {
         return true;
     }
 
-    private String getDriverQuery(String condition) {
-        return  "SELECT count(\"" + dot(EVENTS, ID) +  "\") AS \"" + OFFENSES_COUNT + "\"," + "\n" +
-                    "sum(\"" + dot(OFFENSES, POINT_COUNT) + "\") as \"" + POINT_COUNT + "\"," + "\n" +
-                    "\"" + dot(DRIVERS, NAME) + "\",\n" +
-                    "\"" + dot(DRIVERS, SURNAME) + "\",\n" +
-                    "\"" + dot(DRIVERS, CITY) + "\",\n" +
-                    "\"" + dot(DRIVERS, ID) + "\"\n" +
-                    "FROM \"" + EVENTS + "\"\n" +
-                    "JOIN \"" + DRIVERS + "\" ON \"" + dot(EVENTS, DRIVER_ID) + "\" = \"" + dot(DRIVERS, ID) + "\"\n" +
-                    condition + (condition.isEmpty() ? "" : "\n") +
-                    "JOIN \"" + OFFENSES + "\" ON \"" + dot(EVENTS, OFFENSE_ID) + "\" = \"" + dot(OFFENSES, ID) + "\"\n" +
-                    "GROUP BY \"" + dot(DRIVERS, ID) + "\", \"" + dot(DRIVERS, NAME) + "\", \"" + dot(DRIVERS, SURNAME) + "\", \"" + dot(DRIVERS, CITY) + "\"";
+    private String getDriverQuery(Condition condition) {
+        return new SelectQuery()
+                .addCustomColumns(
+                        FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)),
+                        FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)),
+                        driversTable.findColumn(NAME),
+                        driversTable.findColumn(SURNAME),
+                        driversTable.findColumn(CITY),
+                        driversTable.findColumn(ID))
+                .addJoin(SelectQuery.JoinType.INNER,
+                        eventsTable,
+                        driversTable,
+                        BinaryCondition.equalTo(eventsTable.findColumn(DRIVER_ID), driversTable.findColumn(ID)))
+                .addJoin(SelectQuery.JoinType.INNER,
+                        eventsTable,
+                        offensesTable,
+                        BinaryCondition.equalTo(eventsTable.findColumn(OFFENSE_ID), offensesTable.findColumn(ID)))
+                .addGroupings(
+                        driversTable.findColumn(ID),
+                        driversTable.findColumn(NAME),
+                        driversTable.findColumn(SURNAME),
+                        driversTable.findColumn(CITY))
+                .addCondition(condition).toString();
     }
 
-    private void createDriversTable() {
-        executeSQL("CREATE TABLE \"" + DRIVERS + "\"(" +
-                "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
-                "\"" + NAME + "\" VARCHAR(20) NOT NULL," +
-                "\"" + SURNAME + "\" VARCHAR(20) NOT NULL," +
-                "\"" + DATE_OF_BIRTH + "\" DATE NOT NULL," +
-                "\"" + SEX + "\" VARCHAR(10) NOT NULL," +
-                "\"" + CITY + "\" VARCHAR(20) NOT NULL," +
-                "\"" + POINT_COUNT + "\" NUMERIC(2) NOT NULL)");
+    private DbTable initializeDriversTable() {
+        DbTable table = new DbTable(schema, DRIVERS);
+        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(NAME, "VARCHAR", 50).notNull();
+        table.addColumn(SURNAME, "VARCHAR", 50).notNull();
+        table.addColumn(DATE_OF_BIRTH, "DATE", null).notNull();
+        table.addColumn(SEX, "VARCHAR", 10).notNull();
+        table.addColumn(CITY, "VARCHAR", 50).notNull();
+        table.addColumn(POINT_COUNT, "SMALLINT", null).notNull();
+        return table;
     }
 
-    private void createEventsTable() {
-        executeSQL("CREATE TABLE \"" + EVENTS + "\"(" +
-                "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
-                "\"" + OFFENSE_ID + "\" NUMERIC(2) NOT NULL," +
-                "\"" + DRIVER_ID + "\" NUMERIC(2) NOT NULL," +
-                "\"" + POLICEMAN_ID + "\" NUMERIC(2) NOT NULL," +
-                "\"" + DATE + "\" DATE NOT NULL," +
-                "\"" + DESCRIPTION + "\" VARCHAR(500) NOT NULL)");
+    private DbTable initializeEventsTable() {
+        DbTable table = new DbTable(schema, EVENTS);
+        table.addColumn(ID, "BIGINT", null);
+        table.addColumn(OFFENSE_ID, "BIGINT", null);
+        table.addColumn(DRIVER_ID, "BIGINT", null);
+        table.addColumn(POLICEMAN_ID, "BIGINT", null);
+        table.addColumn(DATE, "DATE", null);
+        table.addColumn(DESCRIPTION, "VARCHAR", 5000);
+        return table;
     }
 
-    private void createPolicemenTable() {
-        executeSQL("CREATE TABLE \"" + POLICEMEN + "\"(" +
-                "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
-                "\"" + NAME + "\" VARCHAR(20) NOT NULL," +
-                "\"" + SURNAME + "\" VARCHAR(20) NOT NULL," +
-                "\"" + NUMBER + "\" NUMERIC(2) NOT NULL," +
-                "\"" + DEPARTMENT_ID + "\" NUMERIC(2))");
+    private DbTable initializePolicemenTable() {
+        DbTable table = new DbTable(schema, POLICEMEN);
+        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(NAME, "VARCHAR", 50).notNull();
+        table.addColumn(SURNAME, "VARCHAR", 50).notNull();
+        table.addColumn(NUMBER, "BIGINT", null).notNull();
+        table.addColumn(DEPARTMENT_ID, "BIGINT", null).notNull();
+        return table;
     }
 
-    private void createPoliceDepartmentsTable() {
-        executeSQL("CREATE TABLE \"" + DEPARTMENTS + "\"(" +
-                "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
-                "\"" + NAME + "\" VARCHAR(100) NOT NULL," +
-                "\"" + CITY + "\" VARCHAR(40) NOT NULL)");
+    private DbTable initializeDepartmentsTable() {
+        DbTable table = new DbTable(schema, DEPARTMENTS);
+        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(NAME, "VARCHAR", 50).notNull();
+        table.addColumn(CITY, "VARCHAR", 50).notNull();
+        return table;
     }
 
-    private void createOffensesTable() {
-        executeSQL("CREATE TABLE \"" + OFFENSES + "\"(" +
-                "\"" + ID + "\" NUMERIC(2) NOT NULL PRIMARY KEY," +
-                "\"" + POINT_COUNT + "\" NUMERIC(2) NOT NULL," +
-                "\"" + NAME + "\" VARCHAR(100) NOT NULL)");
+    private DbTable initializeOffensesTable() {
+        DbTable table = new DbTable(schema, OFFENSES);
+        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(POINT_COUNT, "SMALLINT", null).notNull();
+        table.addColumn(NAME, "VARCHAR", 100).notNull();
+        return table;
     }
 
     public ResultSet getAllCities() {
         return executeSQL("SELECT DISTINCT \"" + CITY + "\" FROM \"" + DRIVERS + "\"");
     }
 
+    private void createTable(DbTable table) {
+        String createTable = new CreateTableQuery(table, true).toString();
+        executeSQL(createTable);
+    }
+
     private boolean isTableReady(String table) {
         try {
             DatabaseMetaData dbm = connection.getMetaData();
-            try (ResultSet tables = dbm.getTables(null, null, table, null)) {
+            try (ResultSet tables = dbm.getTables(null, null, table.toUpperCase(), null)) {
                 return tables.next();
             }
         } catch (SQLException e) {
@@ -142,7 +178,34 @@ public class DBManager {
         return false;
     }
 
-    private static String dot(String one, String two) {
-        return one + "\".\"" + two;
+    public ObservableList<DepartmentTableItem> getDepartmentsWithinYear(int year) {
+        LocalDate start = LocalDate.ofYearDay(year, 1);
+        LocalDate end = LocalDate.ofYearDay(year, start.isLeapYear() ? 366 : 365);
+        String customQuery = new SelectQuery()
+                .addCustomColumns(
+                        FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)),
+                        departmentsTable.findColumn(CITY),
+                        departmentsTable.findColumn(NAME),
+                        departmentsTable.findColumn(ID))
+                .addCustomJoin(SelectQuery.JoinType.INNER,
+                        eventsTable, departmentsTable,
+                        BinaryCondition.equalTo(departmentsTable.findColumn(ID), eventsTable.findColumn(DEPARTMENT_ID)))
+                .addCustomGroupings
+                        (departmentsTable.findColumn(CITY),
+                        departmentsTable.findColumn(NAME),
+                        departmentsTable.findColumn(ID))
+                .addCondition(ComboCondition.and(BinaryCondition.greaterThan(eventsTable.findColumn(DATE), start, true),
+                                                BinaryCondition.lessThan(eventsTable.findColumn(DATE), end, true)))
+                .validate().toString();
+        executeSQL(customQuery);
+        return FXCollections.emptyObservableList();
+    }
+
+    private void initializeTables() {
+        departmentsTable = initializeDepartmentsTable();
+        offensesTable = initializeOffensesTable();
+        policemenTable = initializePolicemenTable();
+        driversTable = initializeDriversTable();
+        eventsTable = initializeEventsTable();
     }
 }
