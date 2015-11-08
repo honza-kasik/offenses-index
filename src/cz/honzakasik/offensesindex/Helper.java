@@ -48,6 +48,24 @@ public abstract class Helper {
         return data;
     }
 
+    public static ObservableList<DepartmentTableItem> transformDepartmentTableData(ResultSet result) {
+        ObservableList<DepartmentTableItem> data = FXCollections.observableArrayList();
+        try {
+            while (result != null && result.next()) {
+                DepartmentTableItem item = new DepartmentTableItem(
+                        result.getString(NAME),
+                        result.getString(CITY),
+                        result.getInt(OFFENSES_COUNT),
+                        result.getInt(ID)
+                );
+                data.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
     public static void displayNothingFoundError(Stage owner) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.initOwner(owner);
@@ -56,5 +74,28 @@ public abstract class Helper {
         alert.setHeaderText("Pro zadané parametry nebyly nalezeny žádné výsledky!");
         alert.setContentText("Opakujte prosím akci s jinými parametry.");
         alert.showAndWait();
+    }
+
+    public static boolean isYear(String str)
+    {
+        return str.matches("[1-9]\\d{3}");  //match a number starting with 1-9
+    }
+
+    public static ObservableList<PolicemanTableItem> transformPolicemenTableData(ResultSet result) {
+        ObservableList<PolicemanTableItem> data = FXCollections.observableArrayList();
+        try {
+            while (result != null && result.next()) {
+                PolicemanTableItem item = new PolicemanTableItem(
+                        result.getString(NAME),
+                        result.getString(SURNAME),
+                        result.getInt(NUMBER),
+                        result.getInt(OFFENSES_COUNT)
+                );
+                data.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 }

@@ -8,13 +8,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,22 +30,57 @@ public class MainWindow extends Application implements Initializable {
     private static final Logger logger = Logger.getLogger(MainWindow.class.getName());
     private Stage primaryStage;
     private final DBManager dbManager = new DBManager();
+    private final ValidationSupport validationSupportDepartment = new ValidationSupport();
+    private final ValidationSupport validationSupportPoliceman = new ValidationSupport();
     @FXML private TableView<DriverTableItem> driversTable;
+    @FXML private TableView<DepartmentTableItem> departmentsTable;
+    @FXML private TableView<PolicemanTableItem> policemenTable;
     @FXML private CheckBox lostLicenseSwitch;
+    @FXML private Button showOffensesWithinYear;
+    @FXML private Button findPolicemenButton;
+    @FXML private TextField offensesYear;
+    @FXML private TextField policemenYear;
+    @FXML private ChoiceBox<String> policemenDepartmentSelector;
+
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        Parent root = FXMLLoader.load(getClass().getResource("mainWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("mainWindow.fxml"));
+        Parent root = loader.load();
         primaryStage.setTitle("Evidence přestupků");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         logger.log(Level.INFO, "MainWindow's stage showed!");
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        driversTable.setItems(Helper.transformDriverTableData(dbManager.getDrivers()));
+        bindDepartmentValidationSupport();
+        bindPolicemenValidationSupport();
+    }
 
-    public static void main(String[] args) {
-        launch(args);
+    private void bindDepartmentValidationSupport() {
+        validationSupportDepartment
+                .registerValidator(offensesYear, (Control c, String newValue) ->
+                        ValidationResult.fromErrorIf(c, "You must fill the year!", !Helper.isYear(newValue)));
+        showOffensesWithinYear.disableProperty().bind(validationSupportDepartment.invalidProperty());
+    }
+
+    private void bindPolicemenValidationSupport() {
+        validationSupportPoliceman
+                .registerValidator(policemenYear, (Control c, String newValue) ->
+                        ValidationResult.fromErrorIf(c, "You must fill the year!", !Helper.isYear(newValue)));
+        validationSupportPoliceman
+                .registerValidator(policemenDepartmentSelector,
+                        Validator.createEmptyValidator("You have to select Department!"));
+        findPolicemenButton.disableProperty().bind(validationSupportPoliceman.invalidProperty());
     }
 
     public void displayDateSelector(ActionEvent actionEvent) throws IOException {
@@ -105,10 +143,25 @@ public class MainWindow extends Application implements Initializable {
     }
 
     public void showOffensesWithinYearAction(ActionEvent actionEvent) {
+        String text = offensesYear.getText();
+        int year = Integer.valueOf(text);
+        ResultSet results = dbManager.getDepartmentsWithinYear(year);
+        if (dbManager.isResultEmpty(results)) {
+            Helper.displayNothingFoundError(primaryStage);
+        } else {
+            departmentsTable.setItems(Helper.transformDepartmentTableData(results));
+        }
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        driversTable.setItems(Helper.transformDriverTableData(dbManager.getDrivers()));
+
+    public void displayPolicemenFromDepartmentWithinYear(ActionEvent actionEvent) {
+        int year = Integer.valueOf(policemenYear.getText());
+        ResultSet result = dbManager.getDepartmentsWithinYear(year);
+        if (dbManager.isResultEmpty(result)) {
+            Helper.displayNothingFoundError(primaryStage);
+        } else {
+            policemenTable.setItems(Helper.transformPolicemenTableData(result));
+        }
+
     }
 }

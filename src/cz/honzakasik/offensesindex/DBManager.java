@@ -2,8 +2,6 @@ package cz.honzakasik.offensesindex;
 
 import com.healthmarketscience.sqlbuilder.*;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -52,19 +50,22 @@ public class DBManager {
 
     public ResultSet getDriversWhoLostLicenseFromCity(String city) {
         return executeSQL(getDriverQuery(
-                ComboCondition.and(BinaryCondition.greaterThan(POINT_COUNT, 12, true),
-                                    BinaryCondition.equalTo(driversTable.findColumn(CITY), city))));
+                ComboCondition.and(
+                        BinaryCondition.greaterThan(POINT_COUNT, 12, true),
+                        BinaryCondition.equalTo(driversTable.findColumn(CITY), city))));
     }
 
     public ResultSet getDriversFromTo(LocalDate[] dates) {
         return executeSQL(getDriverQuery(
-                ComboCondition.and(BinaryCondition.greaterThan(eventsTable.findColumn(DATE), dates[0], true),
-                                    BinaryCondition.lessThan(eventsTable.findColumn(DATE), dates[1], true))));
+                ComboCondition.and(
+                        BinaryCondition.greaterThan(eventsTable.findColumn(DATE), dates[0], true),
+                        BinaryCondition.lessThan(eventsTable.findColumn(DATE), dates[1], true))));
     }
 
     private ResultSet executeSQL(String SQL) {
         try {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            Statement statement = connection.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             logger.log(Level.INFO, "Executing: " + SQL);
             statement.execute(SQL);
             return statement.getResultSet();
@@ -105,7 +106,7 @@ public class DBManager {
                         driversTable.findColumn(NAME),
                         driversTable.findColumn(SURNAME),
                         driversTable.findColumn(CITY))
-                .addCondition(condition).toString();
+                .addCondition(condition).validate().toString();
     }
 
     private DbTable initializeDriversTable() {
@@ -116,7 +117,6 @@ public class DBManager {
         table.addColumn(DATE_OF_BIRTH, "DATE", null).notNull();
         table.addColumn(SEX, "VARCHAR", 10).notNull();
         table.addColumn(CITY, "VARCHAR", 50).notNull();
-        table.addColumn(POINT_COUNT, "SMALLINT", null).notNull();
         return table;
     }
 
@@ -157,12 +157,53 @@ public class DBManager {
         return table;
     }
 
+    private ResultSet getPolicemenFromDepartmentWithinYear(String department, int year) {
+        LocalDate start = LocalDate.ofYearDay(year, 1);
+        LocalDate end = LocalDate.ofYearDay(year, start.isLeapYear() ? 366 : 365);
+        Condition departmentCondition = BinaryCondition.equalTo(departmentsTable.findColumn(NAME), department);
+        Condition comboCondition = ComboCondition.and(
+                departmentCondition,
+                BinaryCondition.greaterThan(eventsTable.findColumn(DATE), start, true),
+                BinaryCondition.lessThan(eventsTable.findColumn(DATE), end, true));
+        return getPolicemen(comboCondition);
+    }
+
+    private ResultSet getAllPolicemen() {
+        return getPolicemen(BinaryCondition.EMPTY);
+    }
+
+    private ResultSet getPolicemen(Condition condition) {
+        String policemenQuery = new SelectQuery()
+                .addCustomColumns(
+                        FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)),
+                        policemenTable.findColumn(NAME),
+                        policemenTable.findColumn(SURNAME),
+                        policemenTable.findColumn(NUMBER))
+                .addJoin(SelectQuery.JoinType.INNER,
+                        eventsTable,
+                        policemenTable,
+                        BinaryCondition.equalTo(eventsTable.findColumn(POLICEMAN_ID), policemenTable.findColumn(ID)))
+                .addJoin(SelectQuery.JoinType.INNER,
+                        policemenTable,
+                        departmentsTable,
+                        BinaryCondition.equalTo(
+                                policemenTable.findColumn(DEPARTMENT_ID),
+                                departmentsTable.findColumn(ID)))
+                .addCondition(condition)
+                .addGroupings(
+                        policemenTable.findColumn(NAME),
+                        policemenTable.findColumn(SURNAME),
+                        policemenTable.findColumn(NUMBER))
+                .validate().toString();
+        return executeSQL(policemenQuery);
+    }
+
     public ResultSet getAllCities() {
         return executeSQL("SELECT DISTINCT \"" + CITY + "\" FROM \"" + DRIVERS + "\"");
     }
 
     private void createTable(DbTable table) {
-        String createTable = new CreateTableQuery(table, true).toString();
+        String createTable = new CreateTableQuery(table, true).validate().toString();
         executeSQL(createTable);
     }
 
@@ -178,7 +219,7 @@ public class DBManager {
         return false;
     }
 
-    public ObservableList<DepartmentTableItem> getDepartmentsWithinYear(int year) {
+    public ResultSet getDepartmentsWithinYear(int year) {
         LocalDate start = LocalDate.ofYearDay(year, 1);
         LocalDate end = LocalDate.ofYearDay(year, start.isLeapYear() ? 366 : 365);
         String customQuery = new SelectQuery()
@@ -188,17 +229,24 @@ public class DBManager {
                         departmentsTable.findColumn(NAME),
                         departmentsTable.findColumn(ID))
                 .addCustomJoin(SelectQuery.JoinType.INNER,
-                        eventsTable, departmentsTable,
-                        BinaryCondition.equalTo(departmentsTable.findColumn(ID), eventsTable.findColumn(DEPARTMENT_ID)))
+                        eventsTable, policemenTable,
+                        BinaryCondition.equalTo(
+                                eventsTable.findColumn(POLICEMAN_ID),
+                                policemenTable.findColumn(ID)))
+                .addCustomJoin(SelectQuery.JoinType.INNER,
+                        policemenTable, departmentsTable,
+                        BinaryCondition.equalTo(
+                                policemenTable.findColumn(DEPARTMENT_ID),
+                                departmentsTable.findColumn(ID)))
                 .addCustomGroupings
                         (departmentsTable.findColumn(CITY),
                         departmentsTable.findColumn(NAME),
                         departmentsTable.findColumn(ID))
-                .addCondition(ComboCondition.and(BinaryCondition.greaterThan(eventsTable.findColumn(DATE), start, true),
-                                                BinaryCondition.lessThan(eventsTable.findColumn(DATE), end, true)))
+                .addCondition(ComboCondition.and(
+                        BinaryCondition.greaterThan(eventsTable.findColumn(DATE), start, true),
+                        BinaryCondition.lessThan(eventsTable.findColumn(DATE), end, true)))
                 .validate().toString();
-        executeSQL(customQuery);
-        return FXCollections.emptyObservableList();
+        return executeSQL(customQuery);
     }
 
     private void initializeTables() {

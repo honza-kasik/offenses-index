@@ -13,6 +13,15 @@ public class DepartmentTableItem {
     private StringProperty name = new SimpleStringProperty();
     private StringProperty location = new SimpleStringProperty();
     private IntegerProperty offenseCount = new SimpleIntegerProperty();
+    private IntegerProperty id = new SimpleIntegerProperty();
+
+
+    public DepartmentTableItem(String name, String location, Integer offenseCount, Integer id) {
+        setName(name);
+        setLocation(location);
+        setOffenseCount(offenseCount);
+        setId(id);
+    }
 
     public String getName() {
         return name.get();
@@ -48,5 +57,18 @@ public class DepartmentTableItem {
 
     public void setOffenseCount(int offenseCount) {
         this.offenseCount.set(offenseCount);
+    }
+
+
+    public int getId() {
+        return id.get();
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id.set(id);
     }
 }
