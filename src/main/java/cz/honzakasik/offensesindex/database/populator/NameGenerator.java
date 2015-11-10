@@ -1,4 +1,4 @@
-package cz.honzakasik.offensesindex.database;
+package cz.honzakasik.offensesindex.database.populator;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * http://stackoverflow.com/a/5025666/4402950
  */
-public abstract class NameGenerator {
+abstract class NameGenerator {
 
     private static final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
 
@@ -15,7 +15,7 @@ public abstract class NameGenerator {
 
     private static final Set<String> identifiers = new HashSet<>();
 
-    public static String randomIdentifier() {
+    static String randomIdentifier() {
         StringBuilder builder = new StringBuilder();
         while (builder.toString().length() == 0) {
             int length = rand.nextInt(5) + 5;

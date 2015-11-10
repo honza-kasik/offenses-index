@@ -1,4 +1,4 @@
-package cz.honzakasik.offensesindex.database;
+package cz.honzakasik.offensesindex.database.populator;
 
 import com.healthmarketscience.sqlbuilder.InsertQuery;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
@@ -10,24 +10,24 @@ import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 /**
  * Created by Jan Kasik on 8.11.15.
  */
-class DBPopulator {
+abstract class DBPopulatorHelper {
 
-    private Random rnd = new Random();
+    private static Random rnd = new Random();
 
-    private String[] cities = new String[]{"Praha", "Brno", "Ostrava", "Zabreh", "Olomouc", "Vyskov", "Zlin"};
-
-    String createInsertUniqueDriverQuery(DbTable table) {
+    static String createInsertUniqueDriverQuery(DbTable table, int id) {
         return new InsertQuery(table)
+                .addCustomColumn(ID, id)
                 .addCustomColumn(NAME, NameGenerator.randomIdentifier())
                 .addCustomColumn(SURNAME, NameGenerator.randomIdentifier())
                 .addCustomColumn(DATE_OF_BIRTH, DateGenerator.randomDate())
-                .addCustomColumn(CITY, cities[rnd.nextInt(cities.length - 1)])
+                .addCustomColumn(CITY, CityGenerator.getRandomCity(rnd))
                 .addCustomColumn(SEX, rnd.nextInt(1) == 1 ? "muz" : "zena")
                 .validate().toString();
     }
 
-    String createInsertUniquePolicemanQuery(DbTable table, int departmentCount) {
+    static String createInsertUniquePolicemanQuery(DbTable table, int id, int departmentCount) {
         return new InsertQuery(table)
+                .addCustomColumn(ID, id)
                 .addCustomColumn(NAME, NameGenerator.randomIdentifier())
                 .addCustomColumn(SURNAME, NameGenerator.randomIdentifier())
                 .addCustomColumn(NUMBER, rnd.nextInt(8999) + 1000) //4 digit number
@@ -35,22 +35,25 @@ class DBPopulator {
                 .validate().toString();
     }
 
-    String createInsertOffenseQuery(DbTable table, int pointCount, String name) {
+    static String createInsertOffenseQuery(DbTable table, int id, int pointCount, String name) {
         return new InsertQuery(table)
+                .addCustomColumn(ID, id)
                 .addCustomColumn(POINT_COUNT, pointCount)
                 .addCustomColumn(NAME, name)
                 .validate().toString();
     }
 
-    String createInsertDepartmentQuery(DbTable table, String name, String city) {
+    static String createInsertDepartmentQuery(DbTable table, int id, String name, String city) {
         return new InsertQuery(table)
+                .addCustomColumn(ID, id)
                 .addCustomColumn(NAME, name)
                 .addCustomColumn(CITY, city)
                 .validate().toString();
     }
 
-    String createInsertEventQuery(DbTable table, int policemenCount, int driversCount, int offenseCount) {
+    static String createInsertEventQuery(DbTable table, int id, int policemenCount, int driversCount, int offenseCount) {
         return new InsertQuery(table)
+                .addCustomColumn(ID, id)
                 .addCustomColumn(POLICEMAN_ID, rnd.nextInt(policemenCount))
                 .addCustomColumn(DRIVER_ID, rnd.nextInt(driversCount))
                 .addCustomColumn(OFFENSE_ID, rnd.nextInt(offenseCount))

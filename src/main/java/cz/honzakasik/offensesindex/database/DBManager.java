@@ -1,8 +1,8 @@
 package cz.honzakasik.offensesindex.database;
 
 import com.healthmarketscience.sqlbuilder.*;
-import com.healthmarketscience.sqlbuilder.dbspec.Constraint;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.*;
+import cz.honzakasik.offensesindex.database.populator.DBPopulator;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -16,18 +16,31 @@ import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 public class DBManager {
 
     private Connection connection;
-    static DbSpec spec = new DbSpec();
-    static DbSchema schema = spec.addDefaultSchema();
-    static DbTable offensesTable = initializeOffensesTable();
-    static DbTable driversTable = initializeDriversTable();
-    static DbTable policemenTable = initializePolicemenTable();
-    static DbTable eventsTable = initializeEventsTable();
-    static DbTable departmentsTable = initializeDepartmentsTable();
+    private DbSpec spec = new DbSpec();
+    private DbSchema schema = spec.addDefaultSchema();
+    private DbTable offensesTable = initializeOffensesTable();
+    private DbTable driversTable = initializeDriversTable();
+    private DbTable policemenTable = initializePolicemenTable();
+    private DbTable eventsTable = initializeEventsTable();
+    private DbTable departmentsTable = initializeDepartmentsTable();
     private Logger logger = Logger.getLogger(DBManager.class.getName());
+    /**
+     * dpPopulated is intended to use as flag only. If any new table is created, flag is set to false.
+     */
+    private boolean dbPopulated = true;
+
+    public boolean isDbPopulated() {
+        return dbPopulated;
+    }
+
+    public void setDbPopulated(boolean dbPopulated) {
+        this.dbPopulated = dbPopulated;
+    }
 
     public DBManager() {
         //initializeTables();
         String url = "jdbc:derby:prestupky_db;create=true";
+        DBPopulator populator = new DBPopulator(this);
         try {
             this.connection = DriverManager.getConnection(url);
             if (!isTableReady(DRIVERS))
@@ -40,6 +53,7 @@ public class DBManager {
                 createTable(departmentsTable);
             if (!isTableReady(POLICEMEN))
                 createTable(policemenTable);
+            if (!isDbPopulated()) populator.populateDatabase();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -52,7 +66,7 @@ public class DBManager {
     public ResultSet getDriversWhoLostLicenseFromCity(String city) {
         return executeSQL(getDriverQuery(
                 ComboCondition.and(
-                        BinaryCondition.greaterThan(POINT_COUNT, 12, true),
+                        BinaryCondition.greaterThan(new CustomSql(POINT_COUNT), 3, true),
                         BinaryCondition.equalTo(driversTable.findColumn(CITY), city))));
     }
 
@@ -63,12 +77,13 @@ public class DBManager {
                         BinaryCondition.lessThan(eventsTable.findColumn(DATE), dates[1], true))));
     }
 
-    private ResultSet executeSQL(String SQL) {
+    public ResultSet executeSQL(String SQL) {
         try {
             Statement statement = connection.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             logger.log(Level.INFO, "Executing: " + SQL);
             statement.execute(SQL);
+            logger.log(Level.INFO, "Result set is " + (isResultEmpty(statement.getResultSet()) ? "empty" : "full"));
             return statement.getResultSet();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -78,7 +93,7 @@ public class DBManager {
 
     public boolean isResultEmpty(ResultSet result) {
         try {
-            return !result.first();
+            return !(result != null && result.first());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -88,12 +103,16 @@ public class DBManager {
     private String getDriverQuery(Condition condition) {
         return new SelectQuery()
                 .addCustomColumns(
-                        FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)),
-                        FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)),
                         driversTable.findColumn(NAME),
                         driversTable.findColumn(SURNAME),
                         driversTable.findColumn(CITY),
                         driversTable.findColumn(ID))
+                .addAliasedColumn(
+                        FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)),
+                        POINT_COUNT)
+                .addAliasedColumn(
+                        FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)),
+                        OFFENSES_COUNT)
                 .addJoin(SelectQuery.JoinType.INNER,
                         eventsTable,
                         driversTable,
@@ -110,7 +129,7 @@ public class DBManager {
                 .addCondition(condition).validate().toString();
     }
 
-    private static DbTable initializeDriversTable() {
+    private DbTable initializeDriversTable() {
         DbTable table = new DbTable(schema, DRIVERS);
         table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(NAME, "VARCHAR", 50).notNull();
@@ -121,7 +140,7 @@ public class DBManager {
         return table;
     }
 
-    private static DbTable initializeEventsTable() {
+    private DbTable initializeEventsTable() {
         DbTable table = new DbTable(schema, EVENTS);
         table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(OFFENSE_ID, "BIGINT", null);
@@ -132,7 +151,7 @@ public class DBManager {
         return table;
     }
 
-    private static DbTable initializePolicemenTable() {
+    private DbTable initializePolicemenTable() {
         DbTable table = new DbTable(schema, POLICEMEN);
         table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(NAME, "VARCHAR", 50).notNull();
@@ -142,7 +161,7 @@ public class DBManager {
         return table;
     }
 
-    private static DbTable initializeDepartmentsTable() {
+    private DbTable initializeDepartmentsTable() {
         DbTable table = new DbTable(schema, DEPARTMENTS);
         table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(NAME, "VARCHAR", 50).notNull();
@@ -150,7 +169,7 @@ public class DBManager {
         return table;
     }
 
-    private static DbTable initializeOffensesTable() {
+    private DbTable initializeOffensesTable() {
         DbTable table = new DbTable(schema, OFFENSES);
         table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(POINT_COUNT, "SMALLINT", null).notNull();
@@ -207,6 +226,7 @@ public class DBManager {
 
     private void createTable(DbTable table) {
         String createTable = new CreateTableQuery(table, true).validate().toString();
+        if (isDbPopulated()) setDbPopulated(false); //set flag
         executeSQL(createTable);
     }
 
@@ -252,11 +272,23 @@ public class DBManager {
         return executeSQL(customQuery);
     }
 
-    private void initializeTables() {
-        departmentsTable = initializeDepartmentsTable();
-        offensesTable = initializeOffensesTable();
-        policemenTable = initializePolicemenTable();
-        driversTable = initializeDriversTable();
-        eventsTable = initializeEventsTable();
+    public DbTable getOffensesTable() {
+        return offensesTable;
+    }
+
+    public DbTable getDriversTable() {
+        return driversTable;
+    }
+
+    public DbTable getPolicemenTable() {
+        return policemenTable;
+    }
+
+    public DbTable getEventsTable() {
+        return eventsTable;
+    }
+
+    public DbTable getDepartmentsTable() {
+        return departmentsTable;
     }
 }

@@ -1,13 +1,13 @@
-package cz.honzakasik.offensesindex.database;
+package cz.honzakasik.offensesindex.database.populator;
 
 import java.time.LocalDate;
 
 /**
  * Created by Jan Kasik on 8.11.15.
  */
-public abstract class DateGenerator {
+abstract class DateGenerator {
 
-    public static LocalDate randomDate() {
+    static LocalDate randomDate() {
 
         int year = randBetween(1900, 2010);
 
