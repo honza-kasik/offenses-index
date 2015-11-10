@@ -1,5 +1,6 @@
 package cz.honzakasik.offensesindex;
 
+import cz.honzakasik.offensesindex.database.DBManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;

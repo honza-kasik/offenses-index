@@ -1,4 +1,4 @@
-package cz.honzakasik.offensesindex;
+package cz.honzakasik.offensesindex.database;
 
 /**
  * Created by Jan Kasik on 1.11.15.

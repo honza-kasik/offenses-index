@@ -1,6 +1,7 @@
-package cz.honzakasik.offensesindex;
+package cz.honzakasik.offensesindex.database;
 
 import com.healthmarketscience.sqlbuilder.*;
+import com.healthmarketscience.sqlbuilder.dbspec.Constraint;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.*;
 
 import java.sql.*;
@@ -8,24 +9,24 @@ import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static cz.honzakasik.offensesindex.DatabaseNames.*;
+import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 /**
  * Created by Jan Kasik on 28.10.15.
  */
 public class DBManager {
 
     private Connection connection;
-    private DbSpec spec = new DbSpec();
-    private DbSchema schema = spec.addDefaultSchema();
-    private DbTable offensesTable;
-    private DbTable driversTable;
-    private DbTable policemenTable;
-    private DbTable eventsTable;
-    private DbTable departmentsTable;
+    static DbSpec spec = new DbSpec();
+    static DbSchema schema = spec.addDefaultSchema();
+    static DbTable offensesTable = initializeOffensesTable();
+    static DbTable driversTable = initializeDriversTable();
+    static DbTable policemenTable = initializePolicemenTable();
+    static DbTable eventsTable = initializeEventsTable();
+    static DbTable departmentsTable = initializeDepartmentsTable();
     private Logger logger = Logger.getLogger(DBManager.class.getName());
 
     public DBManager() {
-        initializeTables();
+        //initializeTables();
         String url = "jdbc:derby:prestupky_db;create=true";
         try {
             this.connection = DriverManager.getConnection(url);
@@ -109,9 +110,9 @@ public class DBManager {
                 .addCondition(condition).validate().toString();
     }
 
-    private DbTable initializeDriversTable() {
+    private static DbTable initializeDriversTable() {
         DbTable table = new DbTable(schema, DRIVERS);
-        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(NAME, "VARCHAR", 50).notNull();
         table.addColumn(SURNAME, "VARCHAR", 50).notNull();
         table.addColumn(DATE_OF_BIRTH, "DATE", null).notNull();
@@ -120,9 +121,9 @@ public class DBManager {
         return table;
     }
 
-    private DbTable initializeEventsTable() {
+    private static DbTable initializeEventsTable() {
         DbTable table = new DbTable(schema, EVENTS);
-        table.addColumn(ID, "BIGINT", null);
+        table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(OFFENSE_ID, "BIGINT", null);
         table.addColumn(DRIVER_ID, "BIGINT", null);
         table.addColumn(POLICEMAN_ID, "BIGINT", null);
@@ -131,9 +132,9 @@ public class DBManager {
         return table;
     }
 
-    private DbTable initializePolicemenTable() {
+    private static DbTable initializePolicemenTable() {
         DbTable table = new DbTable(schema, POLICEMEN);
-        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(NAME, "VARCHAR", 50).notNull();
         table.addColumn(SURNAME, "VARCHAR", 50).notNull();
         table.addColumn(NUMBER, "BIGINT", null).notNull();
@@ -141,17 +142,17 @@ public class DBManager {
         return table;
     }
 
-    private DbTable initializeDepartmentsTable() {
+    private static DbTable initializeDepartmentsTable() {
         DbTable table = new DbTable(schema, DEPARTMENTS);
-        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(NAME, "VARCHAR", 50).notNull();
         table.addColumn(CITY, "VARCHAR", 50).notNull();
         return table;
     }
 
-    private DbTable initializeOffensesTable() {
+    private static DbTable initializeOffensesTable() {
         DbTable table = new DbTable(schema, OFFENSES);
-        table.addColumn(ID, "BIGINT", null).notNull();
+        table.addColumn(ID, "BIGINT", null).primaryKey();
         table.addColumn(POINT_COUNT, "SMALLINT", null).notNull();
         table.addColumn(NAME, "VARCHAR", 100).notNull();
         return table;
@@ -199,7 +200,9 @@ public class DBManager {
     }
 
     public ResultSet getAllCities() {
-        return executeSQL("SELECT DISTINCT \"" + CITY + "\" FROM \"" + DRIVERS + "\"");
+        String citiesQuery = new SelectQuery(true)
+                .addCustomColumns(driversTable.findColumn(CITY)).validate().toString();
+        return executeSQL(citiesQuery);
     }
 
     private void createTable(DbTable table) {

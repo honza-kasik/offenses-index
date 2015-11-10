@@ -1,5 +1,6 @@
 package cz.honzakasik.offensesindex;
 
+import cz.honzakasik.offensesindex.database.DBManager;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -40,7 +41,7 @@ public class MainWindow extends Application implements Initializable {
     @FXML private Button findPolicemenButton;
     @FXML private TextField offensesYear;
     @FXML private TextField policemenYear;
-    @FXML private ChoiceBox<String> policemenDepartmentSelector;
+    @FXML private ComboBox<String> policemenDepartmentSelector;
 
 
     public static void main(String[] args) {
@@ -74,12 +75,13 @@ public class MainWindow extends Application implements Initializable {
     }
 
     private void bindPolicemenValidationSupport() {
+        ValidationSupport.setRequired(policemenDepartmentSelector, true);
+         validationSupportPoliceman
+                .registerValidator(policemenDepartmentSelector,
+                        Validator.createEmptyValidator("bla"));
         validationSupportPoliceman
                 .registerValidator(policemenYear, (Control c, String newValue) ->
                         ValidationResult.fromErrorIf(c, "You must fill the year!", !Helper.isYear(newValue)));
-        validationSupportPoliceman
-                .registerValidator(policemenDepartmentSelector,
-                        Validator.createEmptyValidator("You have to select Department!"));
         findPolicemenButton.disableProperty().bind(validationSupportPoliceman.invalidProperty());
     }
 

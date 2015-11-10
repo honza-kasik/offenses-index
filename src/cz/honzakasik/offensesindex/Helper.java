@@ -9,8 +9,8 @@ import javafx.stage.Stage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static cz.honzakasik.offensesindex.DatabaseNames.*;
-import static cz.honzakasik.offensesindex.DatabaseNames.CITY;
+import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
+import static cz.honzakasik.offensesindex.database.DatabaseNames.CITY;
 
 /**
  * Created by Jan Kasik on 4.11.15.

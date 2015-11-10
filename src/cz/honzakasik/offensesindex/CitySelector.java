@@ -46,7 +46,6 @@ public class CitySelector implements Initializable {
 
     public void setItems(ObservableList<String> items) {
         citySelector.setItems(items);
-        citySelector.setValue(items.get(0));
     }
 
     @Override
