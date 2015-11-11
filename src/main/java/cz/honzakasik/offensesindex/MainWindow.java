@@ -51,8 +51,7 @@ public class MainWindow extends Application implements Initializable {
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("mainWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("mainWindow.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("Evidence přestupků");
         primaryStage.setScene(new Scene(root));
@@ -86,7 +85,7 @@ public class MainWindow extends Application implements Initializable {
     }
 
     public void displayDateSelector(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("selectDateSection.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("selectDateSection.fxml"));
         Parent root = loader.load();
 
         DateSelector controller = loader.getController();
@@ -118,7 +117,7 @@ public class MainWindow extends Application implements Initializable {
     }
 
     private void displayCitySelector() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("cityChoser.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("cityChoser.fxml"));
         Parent root = loader.load();
 
         CitySelector controller = loader.getController();

@@ -60,18 +60,19 @@ public class DBManager {
     }
 
     public ResultSet getDrivers() {
-        return executeSQL(getDriverQuery(BinaryCondition.EMPTY));
+        return executeSQL(getDriverQuery(
+                BinaryCondition.EMPTY, BinaryCondition.EMPTY));
     }
 
     public ResultSet getDriversWhoLostLicenseFromCity(String city) {
         return executeSQL(getDriverQuery(
-                ComboCondition.and(
-                        BinaryCondition.greaterThan(new CustomSql(POINT_COUNT), 3, true),
-                        BinaryCondition.equalTo(driversTable.findColumn(CITY), city))));
+                        BinaryCondition.greaterThan(FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)), 7, true),
+                        BinaryCondition.equalTo(driversTable.findColumn(CITY), city)));
     }
 
     public ResultSet getDriversFromTo(LocalDate[] dates) {
         return executeSQL(getDriverQuery(
+                BinaryCondition.EMPTY,
                 ComboCondition.and(
                         BinaryCondition.greaterThan(eventsTable.findColumn(DATE), dates[0], true),
                         BinaryCondition.lessThan(eventsTable.findColumn(DATE), dates[1], true))));
@@ -83,7 +84,10 @@ public class DBManager {
                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             logger.log(Level.INFO, "Executing: " + SQL);
             statement.execute(SQL);
-            logger.log(Level.INFO, "Result set is " + (isResultEmpty(statement.getResultSet()) ? "empty" : "full"));
+            ResultSet resultSet = statement.getResultSet();
+
+            //logger.log(Level.INFO, "Result set is " + (isResultEmpty(resultSet) ? "empty" : "full"));
+            //logger.log(Level.INFO, resutlToString(resultSet));
             return statement.getResultSet();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -100,7 +104,7 @@ public class DBManager {
         return true;
     }
 
-    private String getDriverQuery(Condition condition) {
+    private String getDriverQuery(Condition havingCondition, Condition condition) {
         return new SelectQuery()
                 .addCustomColumns(
                         driversTable.findColumn(NAME),
@@ -111,7 +115,7 @@ public class DBManager {
                         FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)),
                         POINT_COUNT)
                 .addAliasedColumn(
-                        FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)),
+                        FunctionCall.count().addColumnParams(offensesTable.findColumn(ID)),
                         OFFENSES_COUNT)
                 .addJoin(SelectQuery.JoinType.INNER,
                         eventsTable,
@@ -126,7 +130,9 @@ public class DBManager {
                         driversTable.findColumn(NAME),
                         driversTable.findColumn(SURNAME),
                         driversTable.findColumn(CITY))
-                .addCondition(condition).validate().toString();
+                .addHaving(havingCondition)
+                .addCondition(condition)
+                .validate().toString();
     }
 
     private DbTable initializeDriversTable() {
@@ -290,5 +296,27 @@ public class DBManager {
 
     public DbTable getDepartmentsTable() {
         return departmentsTable;
+    }
+
+    private String resutlToString(ResultSet rs) {
+        StringBuilder sb = new StringBuilder(2048);
+        sb.append("\n");
+
+        // Fetch each row from the result set
+        try {
+            ResultSetMetaData rsmd = rs.getMetaData();
+            for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+                sb.append(rsmd.getColumnName(i) + "\t");
+            }
+            sb.append("\n");
+            while (rs.next()) {
+                // Get the data from the row using the column index
+
+                sb.append( String.format("%-10s%-10s%-10s%3s%3s%3s", rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6)) + "\n");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 }
