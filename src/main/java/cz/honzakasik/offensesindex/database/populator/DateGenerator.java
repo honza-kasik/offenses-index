@@ -8,12 +8,13 @@ import java.time.LocalDate;
 abstract class DateGenerator {
 
     static LocalDate randomDate() {
+        return randomDate(1900, 2015);
+    }
 
-        int year = randBetween(1900, 2010);
+    static LocalDate randomDate(int fromYear, int toYear) {
+        LocalDate date = LocalDate.ofYearDay(randBetween(fromYear, toYear), 1);
 
-        int dayOfYear = randBetween(1, LocalDate.ofYearDay(year, 5).lengthOfYear());
-
-        return  LocalDate.ofYearDay(year, dayOfYear);
+        return  date.withDayOfYear(randBetween(1, date.lengthOfYear()));
     }
 
     private static int randBetween(int start, int end) {

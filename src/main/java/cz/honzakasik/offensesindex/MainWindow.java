@@ -34,7 +34,7 @@ public class MainWindow extends Application implements Initializable {
     private final ValidationSupport validationSupportDepartment = new ValidationSupport();
     private final ValidationSupport validationSupportPoliceman = new ValidationSupport();
     @FXML private TableView<DriverTableItem> driversTable;
-    @FXML private TableView<DepartmentTableItem> departmentsTable;
+    @FXML private TableView<DepartmentTableItem> departmentTable;
     @FXML private TableView<PolicemanTableItem> policemenTable;
     @FXML private CheckBox lostLicenseSwitch;
     @FXML private Button showOffensesWithinYear;
@@ -62,6 +62,9 @@ public class MainWindow extends Application implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         driversTable.setItems(Helper.transformDriverTableData(dbManager.getDrivers()));
+        departmentTable.setItems(Helper.transformDepartmentTableData(dbManager.getAllDepartments()));
+        policemenTable.setItems(Helper.transformPolicemenTableData(dbManager.getAllPolicemen()));
+        policemenDepartmentSelector.setItems(Helper.transformDepartmentSelectorData(dbManager.getAllDepartmentsNames()));
         bindDepartmentValidationSupport();
         bindPolicemenValidationSupport();
     }
@@ -150,19 +153,20 @@ public class MainWindow extends Application implements Initializable {
         if (dbManager.isResultEmpty(results)) {
             Helper.displayNothingFoundError(primaryStage);
         } else {
-            departmentsTable.setItems(Helper.transformDepartmentTableData(results));
+            departmentTable.setItems(Helper.transformDepartmentTableData(results));
         }
     }
 
 
     public void displayPolicemenFromDepartmentWithinYear(ActionEvent actionEvent) {
         int year = Integer.valueOf(policemenYear.getText());
-        ResultSet result = dbManager.getDepartmentsWithinYear(year);
+        ResultSet result = dbManager.getPolicemenFromDepartmentWithinYear(policemenDepartmentSelector.getValue(), year);
+        policemenTable.setItems(Helper.transformPolicemenTableData(result));
         if (dbManager.isResultEmpty(result)) {
             Helper.displayNothingFoundError(primaryStage);
-        } else {
-            policemenTable.setItems(Helper.transformPolicemenTableData(result));
+            policemenYear.clear();
+            policemenDepartmentSelector.setValue(null);
+            policemenTable.setItems(Helper.transformPolicemenTableData(dbManager.getAllPolicemen()));
         }
-
     }
 }

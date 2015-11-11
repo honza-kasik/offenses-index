@@ -71,4 +71,14 @@ public class DepartmentTableItem {
     public void setId(int id) {
         this.id.set(id);
     }
+
+    @Override
+    public String toString() {
+        return "DepartmentTableItem{" +
+                "name=" + name +
+                ", location=" + location +
+                ", offenseCount=" + offenseCount +
+                ", id=" + id +
+                '}';
+    }
 }

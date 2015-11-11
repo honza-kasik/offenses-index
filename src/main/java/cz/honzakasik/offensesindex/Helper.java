@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 import static cz.honzakasik.offensesindex.database.DatabaseNames.CITY;
@@ -16,6 +18,8 @@ import static cz.honzakasik.offensesindex.database.DatabaseNames.CITY;
  * Created by Jan Kasik on 4.11.15.
  */
 public abstract class Helper {
+
+    private static Logger logger = Logger.getLogger(Helper.class.toString());
 
     public static ObservableList<DriverTableItem> transformDriverTableData(ResultSet result) {
         ObservableList<DriverTableItem> data = FXCollections.observableArrayList();
@@ -37,10 +41,18 @@ public abstract class Helper {
     }
 
     public static ObservableList<String> transformCitySelectorData(ResultSet result) {
+        return transformStringData(result, CITY);
+    }
+
+    public static ObservableList<String> transformDepartmentSelectorData(ResultSet result) {
+        return transformStringData(result, NAME);
+    }
+
+    public static ObservableList<String> transformStringData(ResultSet result, String name) {
         ObservableList<String> data = FXCollections.observableArrayList();
         try {
             while (result != null && result.next()) {
-                data.add(result.getString(CITY));
+                data.add(result.getString(name));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,6 +75,7 @@ public abstract class Helper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        logger.log(Level.INFO, data.toString() + "\n");
         return data;
     }
 

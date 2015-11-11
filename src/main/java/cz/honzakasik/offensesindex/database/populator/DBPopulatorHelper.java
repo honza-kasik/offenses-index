@@ -57,7 +57,7 @@ abstract class DBPopulatorHelper {
                 .addCustomColumn(POLICEMAN_ID, rnd.nextInt(policemenCount))
                 .addCustomColumn(DRIVER_ID, rnd.nextInt(driversCount))
                 .addCustomColumn(OFFENSE_ID, rnd.nextInt(offenseCount))
-                .addCustomColumn(DATE, DateGenerator.randomDate())
+                .addCustomColumn(DATE, DateGenerator.randomDate(2000, 2005))
                 .addCustomColumn(DESCRIPTION, NameGenerator.randomIdentifier())
                 .validate().toString();
     }
