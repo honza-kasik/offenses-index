@@ -169,4 +169,7 @@ public class MainWindow extends Application implements Initializable {
             policemenTable.setItems(Helper.transformPolicemenTableData(dbManager.getAllPolicemen()));
         }
     }
+
+    public void showOffensesWithinMonths(ActionEvent actionEvent) {
+    }
 }
