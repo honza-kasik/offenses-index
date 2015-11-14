@@ -24,7 +24,7 @@ public class DBManager {
     private DbTable policemenTable = initializePolicemenTable();
     private DbTable eventsTable = initializeEventsTable();
     private DbTable departmentsTable = initializeDepartmentsTable();
-    private Logger logger = Logger.getLogger(DBManager.class.getName());
+    private static Logger logger = Logger.getLogger(DBManager.class.getName());
     /**
      * dpPopulated is intended to use as flag only. If any new table is created, flag is set to false.
      */
@@ -39,11 +39,10 @@ public class DBManager {
     }
 
     public DBManager() {
-        //initializeTables();
         String url = "jdbc:derby:prestupky_db;create=true";
         DBPopulator populator = new DBPopulator(this);
         try {
-            this.connection = DriverManager.getConnection(url);
+            connection = DriverManager.getConnection(url);
             if (!isTableReady(DRIVERS))
                 createTable(driversTable);
             if (!isTableReady(EVENTS))
@@ -58,80 +57,6 @@ public class DBManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public ResultSet getDrivers() {
-        return executeSQL(getDriverQuery(
-                BinaryCondition.EMPTY, BinaryCondition.EMPTY));
-    }
-
-    public ResultSet getDriversWhoLostLicenseFromCity(String city) {
-        return executeSQL(getDriverQuery(
-                BinaryCondition.greaterThan(
-                        FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)),
-                        12, true),
-                BinaryCondition.equalTo(driversTable.findColumn(CITY), city)));
-    }
-
-    public ResultSet getDriversFromTo(LocalDate[] dates) {
-        return executeSQL(getDriverQuery(
-                BinaryCondition.EMPTY,
-                ComboCondition.and(
-                        BinaryCondition.greaterThan(eventsTable.findColumn(DATE), dates[0], true),
-                        BinaryCondition.lessThan(eventsTable.findColumn(DATE), dates[1], true))));
-    }
-
-    public ResultSet executeSQL(String SQL) {
-        try {
-            Statement statement = connection.createStatement(
-                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            logger.log(Level.INFO, "Executing: " + SQL);
-            statement.execute(SQL);
-            return statement.getResultSet();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean isResultEmpty(ResultSet result) {
-        try {
-            return !(result != null && result.first());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
-    private String getDriverQuery(Condition havingCondition, Condition condition) {
-        return new SelectQuery()
-                .addCustomColumns(
-                        driversTable.findColumn(NAME),
-                        driversTable.findColumn(SURNAME),
-                        driversTable.findColumn(CITY),
-                        driversTable.findColumn(ID))
-                .addAliasedColumn(
-                        FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)),
-                        POINT_COUNT)
-                .addAliasedColumn(
-                        FunctionCall.count().addColumnParams(offensesTable.findColumn(ID)),
-                        OFFENSES_COUNT)
-                .addJoin(SelectQuery.JoinType.INNER,
-                        eventsTable,
-                        driversTable,
-                        BinaryCondition.equalTo(eventsTable.findColumn(DRIVER_ID), driversTable.findColumn(ID)))
-                .addJoin(SelectQuery.JoinType.INNER,
-                        eventsTable,
-                        offensesTable,
-                        BinaryCondition.equalTo(eventsTable.findColumn(OFFENSE_ID), offensesTable.findColumn(ID)))
-                .addGroupings(
-                        driversTable.findColumn(ID),
-                        driversTable.findColumn(NAME),
-                        driversTable.findColumn(SURNAME),
-                        driversTable.findColumn(CITY))
-                .addHaving(havingCondition)
-                .addCondition(condition)
-                .validate().toString();
     }
 
     private DbTable initializeDriversTable() {
@@ -313,24 +238,48 @@ public class DBManager {
         return departmentsTable;
     }
 
-    private String resultToString(ResultSet rs) {
-        StringBuilder sb = new StringBuilder(2048);
-        sb.append("\n");
+    public ResultSet getOffenses(Condition condition) {
+        String query = new SelectQuery()
+                .addColumns(
+                        offensesTable.findColumn(NAME))
+                .addAliasedColumn(
+                        FunctionCall.count().addColumnParams(eventsTable.findColumns(ID)),
+                        OFFENSES_COUNT)
+                .addCustomJoin(SelectQuery.JoinType.INNER,
+                        eventsTable,
+                        offensesTable,
+                        BinaryCondition.equalTo(eventsTable.findColumn(OFFENSE_ID), offensesTable.findColumn(ID)))
+                .addCustomGroupings(offensesTable.findColumn(NAME))
+                .addCondition(condition)
+                .validate().toString();
+        return executeSQL(query);
+    }
 
+    public ResultSet getAllOffenses() {
+        return getOffenses(BinaryCondition.EMPTY);
+    }
+
+    public ResultSet getOffensesWithinMonths(int fromMonth, int toMonth) {
+        CustomSql monthFromColumn = new CustomSql("MONTH(" + eventsTable.findColumn(DATE).getColumnNameSQL() + ")");
+        return getOffenses(ComboCondition.and()
+                .addCondition(BinaryCondition
+                        .greaterThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
+                                fromMonth, true))
+                .addCondition(BinaryCondition
+                        .lessThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
+                                toMonth, true)));
+    }
+
+    public ResultSet executeSQL(String SQL) {
         try {
-            ResultSetMetaData rsmd = rs.getMetaData();
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                sb.append(rsmd.getColumnName(i)).append("\t");
-            }
-            sb.append("\n");
-            while (rs.next()) {
-                sb.append(String.format("%-10s%-10s%-10s%3s%3s%3s",
-                        rs.getString(1), rs.getString(2), rs.getString(3),
-                        rs.getString(4), rs.getString(5), rs.getString(6))).append("\n");
-            }
+            Statement statement = connection.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            logger.log(Level.INFO, "Executing: " + SQL);
+            statement.execute(SQL);
+            return statement.getResultSet();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return sb.toString();
+        return null;
     }
 }

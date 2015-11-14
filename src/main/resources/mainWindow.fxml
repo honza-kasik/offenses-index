@@ -9,198 +9,30 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.honzakasik.offensesindex.MainWindow">
+<BorderPane fx:id="root" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.honzakasik.offensesindex.MainWindowController">
     <center>
         <TabPane prefHeight="470.0" prefWidth="718.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
                 <Tab text="Drivers">
                     <content>
-                        <BorderPane>
-                            <center>
-                                <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
-                                    <content>
-                                        <TableView fx:id="driversTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                            <columns>
-                                                <TableColumn id="driverSurname" fx:id="surname" prefWidth="75.0" text="Příjmení">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="surname" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn id="driverName" fx:id="name" prefWidth="75.0" text="Jméno">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="name" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn id="driverAddress" fx:id="address" prefWidth="75.0" text="Bydliště">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="address" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn fx:id="offenseCount" prefWidth="75.0" text="Přestupky">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="offenseCount" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn prefWidth="75.0" text="Počet bodů">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="pointCount" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                            </columns>
-                                            <columnResizePolicy>
-                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                            </columnResizePolicy>
-                                        </TableView>
-                                    </content>
-                                </ScrollPane>
-                            </center>
-                            <top>
-                                <ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
-                                    <items>
-                                        <MenuButton text="View">
-                                            <items>
-                                                <MenuItem mnemonicParsing="false" onAction="#displayDateSelector" text="Offenses within period" />
-                                                <CustomMenuItem mnemonicParsing="false" text="Unspecified Action">
-                                                    <content>
-                                                        <Label text="Year:" />
-                                                        <CheckBox fx:id="lostLicenseSwitch" onAction="#displayDriversWhoLostLicenseSwitch" text="Only without license" />
-                                                    </content>
-                                                </CustomMenuItem>
-                                            </items>
-                                        </MenuButton>
-                                        <Button mnemonicParsing="false" onAction="#addDriverAction" text="Add driver" />
-                                    </items>
-                                </ToolBar>
-                            </top>
-                        </BorderPane>
+                        <fx:include fx:id="driversTab" source="tabs/drivers.fxml"/>
                     </content>
                 </Tab>
                 <Tab fx:id="tabDepartment" text="Departments">
                     <content>
-                        <BorderPane>
-                            <center>
-                                <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
-                                    <content>
-                                        <TableView fx:id="departmentTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                            <columns>
-                                                <TableColumn prefWidth="75.0" text="Name">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="name" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn prefWidth="75.0" text="Location">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="location" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn prefWidth="75.0" text="Offenses count">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="offenseCount" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                            </columns>
-                                            <columnResizePolicy>
-                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                            </columnResizePolicy>
-                                        </TableView>
-                                    </content>
-                                </ScrollPane>
-                            </center>
-                            <top>
-                                <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                    <items>
-                                        <Label text="Year:" />
-                                        <TextField fx:id="offensesYear" prefWidth="80.0" />
-                                        <Button fx:id="showOffensesWithinYear" defaultButton="true" mnemonicParsing="false" onAction="#showOffensesWithinYearAction" text="Show offenses within this year" />
-                                    </items>
-                                </ToolBar>
-                            </top>
-                        </BorderPane>
+                        <fx:include fx:id="departmentsTab" source="tabs/departments.fxml"/>
                     </content>
                 </Tab>
                 <Tab onSelectionChanged="#loadActualInformation" text="Policemen">
                     <content>
-                        <BorderPane>
-                            <top>
-                                <ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
-                                    <items>
-                                        <Label layoutX="164.0" layoutY="17.0" text="Department" />
-                                        <ComboBox fx:id="policemenDepartmentSelector" prefWidth="150.0" />
-                                        <Label text="within year" />
-                                        <TextField fx:id="policemenYear" prefWidth="80.0" />
-                                        <Button fx:id="findPolicemenButton" defaultButton="true" mnemonicParsing="false" onAction="#displayPolicemenFromDepartmentWithinYear" text="Find" />
-                                    </items>
-                                </ToolBar>
-                            </top>
-                            <center>
-                                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                    <content>
-                                        <TableView fx:id="policemenTable">
-                                            <columns>
-                                                <TableColumn prefWidth="75.0" text="Name">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="name" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn prefWidth="75.0" text="Surname">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="surname" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn prefWidth="75.0" text="Number">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="number" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                                <TableColumn prefWidth="75.0" text="Offense Count">
-                                                    <cellValueFactory>
-                                                        <PropertyValueFactory property="offenseCount" />
-                                                    </cellValueFactory>
-                                                </TableColumn>
-                                            </columns>
-                                            <columnResizePolicy>
-                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                            </columnResizePolicy>
-                                        </TableView>
-                                    </content>
-                                </ScrollPane>
-                            </center>
-                        </BorderPane>
+                        <fx:include fx:id="policemenTab" source="tabs/policemen.fxml"/>
                     </content>
                 </Tab>
                 <Tab onSelectionChanged="#loadActualInformation" text="Offenses">
-               <content>
-                  <BorderPane prefHeight="200.0" prefWidth="200.0">
-                     <top>
-                        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                          <items>
-                              <Label text="From month" />
-                              <TextField fx:id="offensesMonthFrom" prefHeight="26.0" prefWidth="80.0" />
-                              <Label text="to month" />
-                              <TextField fx:id="offensesMonthTo" prefHeight="26.0" prefWidth="80.0" />
-                              <Label text="with point count equal to" />
-                              <ChoiceBox fx:id="offensesPointCoun" prefHeight="26.0" prefWidth="52.0" />
-                            <Button fx:id="showOffensesButton" defaultButton="true" mnemonicParsing="false" onAction="#showOffensesWithinMonths" text="Show offenses" />
-                          </items>
-                        </ToolBar>
-                     </top>
-                     <center>
-                        <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
-                           <content>
-                              <TableView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                <columns>
-                                  <TableColumn prefWidth="75.0" text="Name" />
-                                  <TableColumn prefWidth="75.0" text="Point count" />
-                                </columns>
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </TableView>
-                           </content>
-                        </ScrollPane>
-                     </center>
-                  </BorderPane>
-               </content></Tab>
+                    <content>
+                        <fx:include fx:id="offensesTab" source="tabs/offenses.fxml"/>
+                    </content>
+                </Tab>
             </tabs>
         </TabPane>
     </center>
