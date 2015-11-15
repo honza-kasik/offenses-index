@@ -30,7 +30,7 @@ public class DepartmentsTabController {
         int year = Integer.valueOf(text);
         ResultSet results = dbManager.getDepartmentsWithinYear(year);
         if (DBHelper.isResultEmpty(results)) {
-            Helper.displayNothingFoundError(null);
+            Helper.displayNothingFoundError(null);//TODO set proper stage
         } else {
             departmentTable.setItems(Helper.transformDepartmentTableData(results));
         }

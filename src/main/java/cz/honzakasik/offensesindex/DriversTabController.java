@@ -36,7 +36,7 @@ public class DriversTabController {
         Scene scene = new Scene(root);
 
         Stage stage = new Stage();
-        stage.initOwner(null);
+        stage.initOwner(null);//TODO set proper stage
         stage.initModality(Modality.WINDOW_MODAL);
 
         stage.setTitle("Zvolte časový úsek pro zobrazení přestupků");
@@ -65,7 +65,7 @@ public class DriversTabController {
         Scene scene = new Scene(root);
 
         Stage stage = new Stage();
-        stage.initOwner(null);
+        stage.initOwner(null);//TODO set proper stage
         stage.initModality(Modality.WINDOW_MODAL);
 
         stage.setTitle("Zvolte město");
@@ -77,7 +77,7 @@ public class DriversTabController {
                 driversTable.setItems(Helper.transformDriverTableData(driversDBManager.getDriversWhoLostLicenseFromCity(result)));
             }
         });
-        controller.setItems(Helper.transformCitySelectorData(null));
+        controller.setItems(Helper.transformCitySelectorData(null));//TODO missing resultSet
         stage.showAndWait();
     }
 

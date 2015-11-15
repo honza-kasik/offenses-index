@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.cell.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.effect.*?>
 <?import javafx.scene.control.*?>
-<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<BorderPane fx:id="root" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.honzakasik.offensesindex.MainWindowController">
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cz.honzakasik.offensesindex.MainWindowController">
     <center>
         <TabPane prefHeight="470.0" prefWidth="718.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
@@ -18,17 +14,17 @@
                         <fx:include fx:id="driversTab" source="tabs/drivers.fxml"/>
                     </content>
                 </Tab>
-                <Tab fx:id="tabDepartment" text="Departments">
+                <Tab text="Departments">
                     <content>
                         <fx:include fx:id="departmentsTab" source="tabs/departments.fxml"/>
                     </content>
                 </Tab>
-                <Tab onSelectionChanged="#loadActualInformation" text="Policemen">
+                <Tab text="Policemen">
                     <content>
                         <fx:include fx:id="policemenTab" source="tabs/policemen.fxml"/>
                     </content>
                 </Tab>
-                <Tab onSelectionChanged="#loadActualInformation" text="Offenses">
+                <Tab text="Offenses">
                     <content>
                         <fx:include fx:id="offensesTab" source="tabs/offenses.fxml"/>
                     </content>
@@ -41,12 +37,12 @@
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
+                        <MenuItem mnemonicParsing="false" text="Close"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem mnemonicParsing="false" text="About"/>
                     </items>
                 </Menu>
             </menus>

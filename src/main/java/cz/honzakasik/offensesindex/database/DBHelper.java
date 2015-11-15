@@ -19,7 +19,7 @@ public class DBHelper {
                 sb.append(rsmd.getColumnName(i)).append("\t");
             }
             sb.append("\n");
-            while (rs.next()) {
+            while (rs.next()) {//TODO generalize
                 sb.append(String.format("%-10s%-10s%-10s%3s%3s%3s",
                         rs.getString(1), rs.getString(2), rs.getString(3),
                         rs.getString(4), rs.getString(5), rs.getString(6))).append("\n");

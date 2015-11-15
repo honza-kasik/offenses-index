@@ -6,8 +6,8 @@
 
 
 <BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0"
-             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-             fx:controller="cz.honzakasik.offensesindex.DepartmentsTabController">
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cz.honzakasik.offensesindex.DepartmentsTabController">
     <center>
         <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
             <content>
@@ -15,22 +15,22 @@
                     <columns>
                         <TableColumn prefWidth="75.0" text="Name">
                             <cellValueFactory>
-                                <PropertyValueFactory property="name" />
+                                <PropertyValueFactory property="name"/>
                             </cellValueFactory>
                         </TableColumn>
                         <TableColumn prefWidth="75.0" text="Location">
                             <cellValueFactory>
-                                <PropertyValueFactory property="location" />
+                                <PropertyValueFactory property="location"/>
                             </cellValueFactory>
                         </TableColumn>
                         <TableColumn prefWidth="75.0" text="Offenses count">
                             <cellValueFactory>
-                                <PropertyValueFactory property="offenseCount" />
+                                <PropertyValueFactory property="offenseCount"/>
                             </cellValueFactory>
                         </TableColumn>
                     </columns>
                     <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                     </columnResizePolicy>
                 </TableView>
             </content>
@@ -39,9 +39,10 @@
     <top>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
-                <Label text="Year:" />
-                <TextField fx:id="offensesYear" prefWidth="80.0" />
-                <Button fx:id="showOffensesWithinYear" defaultButton="true" mnemonicParsing="false" onAction="#showOffensesWithinYearAction" text="Show offenses within this year" />
+                <Label text="Year:"/>
+                <TextField fx:id="offensesYear" prefWidth="80.0"/>
+                <Button fx:id="showOffensesWithinYear" defaultButton="true" mnemonicParsing="false"
+                        onAction="#showOffensesWithinYearAction" text="Show offenses within this year"/>
             </items>
         </ToolBar>
     </top>
