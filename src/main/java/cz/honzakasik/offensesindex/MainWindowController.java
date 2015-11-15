@@ -1,6 +1,10 @@
 package cz.honzakasik.offensesindex;
 
 import cz.honzakasik.offensesindex.database.DBManager;
+import cz.honzakasik.offensesindex.departments.DepartmentsTabController;
+import cz.honzakasik.offensesindex.drivers.DriversTabController;
+import cz.honzakasik.offensesindex.offenses.OffensesTabController;
+import cz.honzakasik.offensesindex.policemen.PolicemenTabController;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

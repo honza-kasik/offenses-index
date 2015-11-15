@@ -1,9 +1,9 @@
-package cz.honzakasik.offensesindex;
+package cz.honzakasik.offensesindex.departments;
 
+import cz.honzakasik.offensesindex.Helper;
 import cz.honzakasik.offensesindex.database.DBHelper;
 import cz.honzakasik.offensesindex.database.DBManager;
 import cz.honzakasik.offensesindex.database.DepartmentsDBManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;

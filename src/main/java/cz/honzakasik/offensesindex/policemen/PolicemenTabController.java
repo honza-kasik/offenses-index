@@ -1,10 +1,10 @@
-package cz.honzakasik.offensesindex;
+package cz.honzakasik.offensesindex.policemen;
 
+import cz.honzakasik.offensesindex.Helper;
 import cz.honzakasik.offensesindex.database.DBHelper;
 import cz.honzakasik.offensesindex.database.DBManager;
 import cz.honzakasik.offensesindex.database.DepartmentsDBManager;
 import cz.honzakasik.offensesindex.database.PolicemenDBManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;

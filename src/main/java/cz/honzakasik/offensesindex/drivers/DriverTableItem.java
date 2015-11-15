@@ -1,4 +1,4 @@
-package cz.honzakasik.offensesindex;
+package cz.honzakasik.offensesindex.drivers;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;

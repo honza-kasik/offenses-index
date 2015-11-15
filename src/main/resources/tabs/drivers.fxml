@@ -6,7 +6,7 @@
 
 <BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="cz.honzakasik.offensesindex.DriversTabController">
+            fx:controller="cz.honzakasik.offensesindex.drivers.DriversTabController">
     <center>
         <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
             <content>

@@ -1,5 +1,8 @@
 package cz.honzakasik.offensesindex;
 
+import cz.honzakasik.offensesindex.departments.DepartmentTableItem;
+import cz.honzakasik.offensesindex.drivers.DriverTableItem;
+import cz.honzakasik.offensesindex.policemen.PolicemanTableItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;

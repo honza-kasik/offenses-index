@@ -1,4 +1,4 @@
-package cz.honzakasik.offensesindex;
+package cz.honzakasik.offensesindex.offenses;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
