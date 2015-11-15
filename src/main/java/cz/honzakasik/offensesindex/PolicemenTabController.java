@@ -2,6 +2,7 @@ package cz.honzakasik.offensesindex;
 
 import cz.honzakasik.offensesindex.database.DBHelper;
 import cz.honzakasik.offensesindex.database.DBManager;
+import cz.honzakasik.offensesindex.database.DepartmentsDBManager;
 import cz.honzakasik.offensesindex.database.PolicemenDBManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,14 +27,11 @@ public class PolicemenTabController {
     private ValidationSupport validationSupport = new ValidationSupport();
     private PolicemenDBManager policemenDBManager;
 
-    public void setPolicemenDBManager(DBManager dbManager) {
-        this.policemenDBManager = new PolicemenDBManager(dbManager);
-    }
-
     public void initialize(DBManager dbManager) {
-        setPolicemenDBManager(dbManager);
+        policemenDBManager = new PolicemenDBManager(dbManager);
+        DepartmentsDBManager departmentsDBManager = new DepartmentsDBManager(dbManager);
         policemenTable.setItems(Helper.transformPolicemenTableData(policemenDBManager.getAllPolicemen()));
-        policemenDepartmentSelector.setItems(Helper.transformDepartmentSelectorData(dbManager.getAllDepartmentsNames()));
+        policemenDepartmentSelector.setItems(Helper.transformDepartmentSelectorData(departmentsDBManager.getAllDepartmentsNames()));
         bindPolicemenValidationSupport();
     }
 

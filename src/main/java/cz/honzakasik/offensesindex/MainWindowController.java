@@ -48,6 +48,6 @@ public class MainWindowController extends Application implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         policemenTabController.initialize(dbManager);
         driversTabController.initialize(dbManager, primaryStage);
-        departmentsTabController.initialize(dbManager);
+        departmentsTabController.initialize(dbManager, primaryStage);
     }
 }

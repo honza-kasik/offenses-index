@@ -22,7 +22,7 @@ public class PolicemenDBManager {
     public PolicemenDBManager(DBManager dbManager) {
         this.dbManager = dbManager;
         policemenTable = dbManager.getPolicemenTable();
-        eventsTable = dbManager.getPolicemenTable();
+        eventsTable = dbManager.getEventsTable();
         departmentsTable = dbManager.getDepartmentsTable();
     }
 
