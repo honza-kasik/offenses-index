@@ -5,6 +5,7 @@ import cz.honzakasik.offensesindex.database.DBHelper;
 import cz.honzakasik.offensesindex.database.DBManager;
 import cz.honzakasik.offensesindex.database.DepartmentsDBManager;
 import cz.honzakasik.offensesindex.database.PolicemenDBManager;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -30,7 +31,7 @@ public class PolicemenTabController {
     public void initialize(DBManager dbManager) {
         policemenDBManager = new PolicemenDBManager(dbManager);
         DepartmentsDBManager departmentsDBManager = new DepartmentsDBManager(dbManager);
-        policemenTable.setItems(Helper.transformPolicemenTableData(policemenDBManager.getAllPolicemen()));
+        policemenTable.setItems(policemenDBManager.getAllPolicemen());
         policemenDepartmentSelector.setItems(Helper.transformDepartmentSelectorData(departmentsDBManager.getAllDepartmentsNames()));
         bindPolicemenValidationSupport();
     }
@@ -48,13 +49,15 @@ public class PolicemenTabController {
 
     public void displayPolicemenFromDepartmentWithinYear() {
         int year = Integer.valueOf(policemenYear.getText());
-        ResultSet result = policemenDBManager.getPolicemenFromDepartmentWithinYear(policemenDepartmentSelector.getValue(), year);
-        policemenTable.setItems(Helper.transformPolicemenTableData(result));
-        if (DBHelper.isResultEmpty(result)) {
+        ObservableList<PolicemanTableItem> result = policemenDBManager
+                .getPolicemenFromDepartmentWithinYear(policemenDepartmentSelector.getValue(), year);
+        if (result.isEmpty()) {
             Helper.displayNothingFoundError((Stage)findPolicemenButton.getScene().getWindow());
             policemenYear.clear();
             policemenDepartmentSelector.setValue(null);
-            policemenTable.setItems(Helper.transformPolicemenTableData(policemenDBManager.getAllPolicemen()));
+            policemenTable.setItems(policemenDBManager.getAllPolicemen());
+        } else {
+            policemenTable.setItems(result);
         }
     }
 }

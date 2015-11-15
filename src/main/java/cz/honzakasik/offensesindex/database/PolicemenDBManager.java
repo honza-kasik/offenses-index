@@ -2,8 +2,12 @@ package cz.honzakasik.offensesindex.database;
 
 import com.healthmarketscience.sqlbuilder.*;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
+import cz.honzakasik.offensesindex.policemen.PolicemanTableItem;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
@@ -26,7 +30,7 @@ public class PolicemenDBManager {
         departmentsTable = dbManager.getDepartmentsTable();
     }
 
-    public ResultSet getPolicemenFromDepartmentWithinYear(String department, int year) {
+    public ObservableList<PolicemanTableItem> getPolicemenFromDepartmentWithinYear(String department, int year) {
         LocalDate start = LocalDate.ofYearDay(year, 1);
         LocalDate end = LocalDate.ofYearDay(year, start.isLeapYear() ? 366 : 365);
         Condition departmentCondition = BinaryCondition.equalTo(departmentsTable.findColumn(NAME), department);
@@ -37,11 +41,11 @@ public class PolicemenDBManager {
         return getPolicemen(comboCondition);
     }
 
-    public ResultSet getAllPolicemen() {
+    public ObservableList<PolicemanTableItem> getAllPolicemen() {
         return getPolicemen(BinaryCondition.EMPTY);
     }
 
-    private ResultSet getPolicemen(Condition condition) {
+    private ObservableList<PolicemanTableItem> getPolicemen(Condition condition) {
         String policemenQuery = new SelectQuery()
                 .addCustomColumns(
                         policemenTable.findColumn(NAME),
@@ -64,7 +68,25 @@ public class PolicemenDBManager {
                         policemenTable.findColumn(SURNAME),
                         policemenTable.findColumn(NUMBER))
                 .validate().toString();
-        return dbManager.executeSQL(policemenQuery);
+        return transformPolicemenTableData(dbManager.executeSQL(policemenQuery));
+    }
+
+    public static ObservableList<PolicemanTableItem> transformPolicemenTableData(ResultSet result) {
+        ObservableList<PolicemanTableItem> data = FXCollections.observableArrayList();
+        try {
+            while (result != null && result.next()) {
+                PolicemanTableItem item = new PolicemanTableItem(
+                        result.getString(NAME),
+                        result.getString(SURNAME),
+                        result.getInt(NUMBER),
+                        result.getInt(OFFENSES_COUNT)
+                );
+                data.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
 }

@@ -101,21 +101,4 @@ public abstract class Helper {
         return string.matches("(0?[1-9]|1[012])");
     }
 
-    public static ObservableList<PolicemanTableItem> transformPolicemenTableData(ResultSet result) {
-        ObservableList<PolicemanTableItem> data = FXCollections.observableArrayList();
-        try {
-            while (result != null && result.next()) {
-                PolicemanTableItem item = new PolicemanTableItem(
-                        result.getString(NAME),
-                        result.getString(SURNAME),
-                        result.getInt(NUMBER),
-                        result.getInt(OFFENSES_COUNT)
-                );
-                data.add(item);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return data;
-    }
 }
