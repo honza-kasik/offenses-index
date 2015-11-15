@@ -24,24 +24,7 @@ public abstract class Helper {
 
     private static Logger logger = Logger.getLogger(Helper.class.toString());
 
-    public static ObservableList<DriverTableItem> transformDriverTableData(ResultSet result) {
-        ObservableList<DriverTableItem> data = FXCollections.observableArrayList();
-        try {
-            while (result != null && result.next()) {
-                DriverTableItem driverTableItem = new DriverTableItem(
-                        result.getString(NAME),
-                        result.getString(SURNAME),
-                        result.getInt(POINT_COUNT),
-                        result.getInt(OFFENSES_COUNT),
-                        result.getString(CITY),
-                        result.getInt(ID));
-                data.add(driverTableItem);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return data;
-    }
+
 
     public static ObservableList<String> transformCitySelectorData(ResultSet result) {
         return transformStringData(result, CITY);

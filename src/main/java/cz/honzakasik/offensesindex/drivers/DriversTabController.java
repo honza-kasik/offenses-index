@@ -50,7 +50,7 @@ public class DriversTabController {
 
         stage.setOnHidden(event -> {
             if (controller.getResult())
-                driversTable.setItems(Helper.transformDriverTableData(driversDBManager.getDriversFromTo(controller.getDates())));
+                driversTable.setItems(driversDBManager.getDriversFromTo(controller.getDates()));
         });
         stage.showAndWait();
     }
@@ -59,7 +59,7 @@ public class DriversTabController {
         if (lostLicenseSwitch.isSelected()) {
             displayCitySelector();
         } else {
-            driversTable.setItems(Helper.transformDriverTableData(driversDBManager.getDrivers()));
+            driversTable.setItems(driversDBManager.getDrivers());
         }
     }
 
@@ -80,7 +80,7 @@ public class DriversTabController {
         stage.setOnHidden(event -> {
             String result = controller.getResult();
             if (result != null && !result.isEmpty()) {
-                driversTable.setItems(Helper.transformDriverTableData(driversDBManager.getDriversWhoLostLicenseFromCity(result)));
+                driversTable.setItems(driversDBManager.getDriversWhoLostLicenseFromCity(result));
             }
         });
         controller.setItems(Helper.transformCitySelectorData(dbManager.getAllCities()));
@@ -94,7 +94,7 @@ public class DriversTabController {
         this.parentStage = parentStage;
         this.dbManager = dbManager;
         setDriversDBManager(dbManager);
-        driversTable.setItems(Helper.transformDriverTableData(driversDBManager.getDrivers()));
+        driversTable.setItems(driversDBManager.getDrivers());
     }
 
 }

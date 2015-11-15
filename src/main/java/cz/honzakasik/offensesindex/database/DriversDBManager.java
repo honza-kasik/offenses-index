@@ -2,8 +2,12 @@ package cz.honzakasik.offensesindex.database;
 
 import com.healthmarketscience.sqlbuilder.*;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
+import cz.honzakasik.offensesindex.drivers.DriverTableItem;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
@@ -26,11 +30,11 @@ public class DriversDBManager {
         eventsTable = dbManager.getEventsTable();
     }
 
-    public ResultSet getDrivers() {
+    public ObservableList<DriverTableItem> getDrivers() {
         return getDrivers(BinaryCondition.EMPTY, BinaryCondition.EMPTY);
     }
 
-    public ResultSet getDriversWhoLostLicenseFromCity(String city) {
+    public ObservableList<DriverTableItem> getDriversWhoLostLicenseFromCity(String city) {
         return getDrivers(
                 BinaryCondition.greaterThan(
                         FunctionCall.sum().addColumnParams(offensesTable.findColumn(POINT_COUNT)),
@@ -38,7 +42,7 @@ public class DriversDBManager {
                 BinaryCondition.equalTo(driversTable.findColumn(CITY), city));
     }
 
-    public ResultSet getDriversFromTo(LocalDate[] dates) {
+    public ObservableList<DriverTableItem> getDriversFromTo(LocalDate[] dates) {
         return getDrivers(
                 BinaryCondition.EMPTY,
                 ComboCondition.and(
@@ -46,7 +50,7 @@ public class DriversDBManager {
                         BinaryCondition.lessThan(eventsTable.findColumn(DATE), dates[1], true)));
     }
 
-    private ResultSet getDrivers(Condition havingCondition, Condition condition) {
+    private ObservableList<DriverTableItem> getDrivers(Condition havingCondition, Condition condition) {
         String query = new SelectQuery()
                 .addCustomColumns(
                         driversTable.findColumn(NAME),
@@ -75,7 +79,26 @@ public class DriversDBManager {
                 .addHaving(havingCondition)
                 .addCondition(condition)
                 .validate().toString();
-        return dbManager.executeSQL(query);
+        return transformDriverTableData(dbManager.executeSQL(query));
+    }
+
+    public ObservableList<DriverTableItem> transformDriverTableData(ResultSet result) {
+        ObservableList<DriverTableItem> data = FXCollections.observableArrayList();
+        try {
+            while (result != null && result.next()) {
+                DriverTableItem driverTableItem = new DriverTableItem(
+                        result.getString(NAME),
+                        result.getString(SURNAME),
+                        result.getInt(POINT_COUNT),
+                        result.getInt(OFFENSES_COUNT),
+                        result.getString(CITY),
+                        result.getInt(ID));
+                data.add(driverTableItem);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
 }
