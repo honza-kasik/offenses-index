@@ -5,7 +5,6 @@ import com.healthmarketscience.sqlbuilder.dbspec.basic.*;
 import cz.honzakasik.offensesindex.database.populator.DBPopulator;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,16 +42,11 @@ public class DBManager {
         DBPopulator populator = new DBPopulator(this);
         try {
             connection = DriverManager.getConnection(url);
-            if (!isTableReady(DRIVERS))
-                createTable(driversTable);
-            if (!isTableReady(EVENTS))
-                createTable(eventsTable);
-            if (!isTableReady(OFFENSES))
-                createTable(offensesTable);
-            if (!isTableReady(DEPARTMENTS))
-                createTable(departmentsTable);
-            if (!isTableReady(POLICEMEN))
-                createTable(policemenTable);
+            if (!isTableReady(DRIVERS)) createTable(driversTable);
+            if (!isTableReady(EVENTS)) createTable(eventsTable);
+            if (!isTableReady(OFFENSES)) createTable(offensesTable);
+            if (!isTableReady(DEPARTMENTS)) createTable(departmentsTable);
+            if (!isTableReady(POLICEMEN)) createTable(policemenTable);
             if (!isDbPopulated()) populator.populateDatabase();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -107,56 +101,9 @@ public class DBManager {
         return table;
     }
 
-    public ResultSet getPolicemenFromDepartmentWithinYear(String department, int year) {
-        LocalDate start = LocalDate.ofYearDay(year, 1);
-        LocalDate end = LocalDate.ofYearDay(year, start.isLeapYear() ? 366 : 365);
-        Condition departmentCondition = BinaryCondition.equalTo(departmentsTable.findColumn(NAME), department);
-        Condition comboCondition = ComboCondition.and(
-                departmentCondition,
-                BinaryCondition.greaterThan(eventsTable.findColumn(DATE), start, true),
-                BinaryCondition.lessThan(eventsTable.findColumn(DATE), end, true));
-        return getPolicemen(comboCondition);
-    }
-
-    public ResultSet getAllPolicemen() {
-        return getPolicemen(BinaryCondition.EMPTY);
-    }
-
-    private ResultSet getPolicemen(Condition condition) {
-        String policemenQuery = new SelectQuery()
-                .addCustomColumns(
-                        policemenTable.findColumn(NAME),
-                        policemenTable.findColumn(SURNAME),
-                        policemenTable.findColumn(NUMBER))
-                .addAliasedColumn( FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)), OFFENSES_COUNT)
-                .addJoin(SelectQuery.JoinType.INNER,
-                        eventsTable,
-                        policemenTable,
-                        BinaryCondition.equalTo(eventsTable.findColumn(POLICEMAN_ID), policemenTable.findColumn(ID)))
-                .addJoin(SelectQuery.JoinType.INNER,
-                        policemenTable,
-                        departmentsTable,
-                        BinaryCondition.equalTo(
-                                policemenTable.findColumn(DEPARTMENT_ID),
-                                departmentsTable.findColumn(ID)))
-                .addCondition(condition)
-                .addGroupings(
-                        policemenTable.findColumn(NAME),
-                        policemenTable.findColumn(SURNAME),
-                        policemenTable.findColumn(NUMBER))
-                .validate().toString();
-        return executeSQL(policemenQuery);
-    }
-
-    public ResultSet getAllCities() {
-        String citiesQuery = new SelectQuery(true)
-                .addCustomColumns(driversTable.findColumn(CITY)).validate().toString();
-        return executeSQL(citiesQuery);
-    }
-
     private void createTable(DbTable table) {
         String createTable = new CreateTableQuery(table, true).validate().toString();
-        if (isDbPopulated()) setDbPopulated(false); //set flag
+        if (isDbPopulated()) setDbPopulated(false);
         executeSQL(createTable);
     }
 
@@ -170,52 +117,6 @@ public class DBManager {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public ResultSet getDepartments(Condition condition) {
-        String customQuery = new SelectQuery()
-                .addCustomColumns(
-                        departmentsTable.findColumn(CITY),
-                        departmentsTable.findColumn(NAME),
-                        departmentsTable.findColumn(ID))
-                .addAliasedColumn(FunctionCall.count().addColumnParams(eventsTable.findColumn(ID)),
-                        OFFENSES_COUNT)
-                .addCustomJoin(SelectQuery.JoinType.INNER,
-                        eventsTable, policemenTable,
-                        BinaryCondition.equalTo(
-                                eventsTable.findColumn(POLICEMAN_ID),
-                                policemenTable.findColumn(ID)))
-                .addCustomJoin(SelectQuery.JoinType.INNER,
-                        policemenTable, departmentsTable,
-                        BinaryCondition.equalTo(
-                                policemenTable.findColumn(DEPARTMENT_ID),
-                                departmentsTable.findColumn(ID)))
-                .addCustomGroupings
-                        (departmentsTable.findColumn(CITY),
-                                departmentsTable.findColumn(NAME),
-                                departmentsTable.findColumn(ID))
-                .addCondition(condition)
-                .validate().toString();
-        return executeSQL(customQuery);
-    }
-
-    public ResultSet getAllDepartments() {
-        return getDepartments(BinaryCondition.EMPTY);
-    }
-
-    public ResultSet getAllDepartmentsNames() {
-        String query = new SelectQuery(true)
-                .addColumns(departmentsTable.findColumns(NAME))
-                .validate().toString();
-        return executeSQL(query);
-    }
-
-    public ResultSet getDepartmentsWithinYear(int year) {
-        LocalDate start = LocalDate.ofYearDay(year, 1);
-        LocalDate end = LocalDate.ofYearDay(year, start.isLeapYear() ? 366 : 365);
-        return getDepartments(ComboCondition.and(
-                BinaryCondition.greaterThan(eventsTable.findColumn(DATE), start, true),
-                BinaryCondition.lessThan(eventsTable.findColumn(DATE), end, true)));
     }
 
     public DbTable getOffensesTable() {
@@ -238,38 +139,6 @@ public class DBManager {
         return departmentsTable;
     }
 
-    public ResultSet getOffenses(Condition condition) {
-        String query = new SelectQuery()
-                .addColumns(
-                        offensesTable.findColumn(NAME))
-                .addAliasedColumn(
-                        FunctionCall.count().addColumnParams(eventsTable.findColumns(ID)),
-                        OFFENSES_COUNT)
-                .addCustomJoin(SelectQuery.JoinType.INNER,
-                        eventsTable,
-                        offensesTable,
-                        BinaryCondition.equalTo(eventsTable.findColumn(OFFENSE_ID), offensesTable.findColumn(ID)))
-                .addCustomGroupings(offensesTable.findColumn(NAME))
-                .addCondition(condition)
-                .validate().toString();
-        return executeSQL(query);
-    }
-
-    public ResultSet getAllOffenses() {
-        return getOffenses(BinaryCondition.EMPTY);
-    }
-
-    public ResultSet getOffensesWithinMonths(int fromMonth, int toMonth) {
-        CustomSql monthFromColumn = new CustomSql("MONTH(" + eventsTable.findColumn(DATE).getColumnNameSQL() + ")");
-        return getOffenses(ComboCondition.and()
-                .addCondition(BinaryCondition
-                        .greaterThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
-                                fromMonth, true))
-                .addCondition(BinaryCondition
-                        .lessThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
-                                toMonth, true)));
-    }
-
     public ResultSet executeSQL(String SQL) {
         try {
             Statement statement = connection.createStatement(
@@ -281,5 +150,11 @@ public class DBManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public ResultSet getAllCities() {
+        String citiesQuery = new SelectQuery(true)
+                .addCustomColumns(driversTable.findColumn(CITY)).validate().toString();
+        return executeSQL(citiesQuery);
     }
 }

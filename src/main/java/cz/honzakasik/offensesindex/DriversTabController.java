@@ -22,6 +22,9 @@ public class DriversTabController {
     @FXML private TableView<DriverTableItem> driversTable;
     @FXML private CheckBox lostLicenseSwitch;
 
+    private Stage parentStage;
+
+    private DBManager dbManager;
     private DriversDBManager driversDBManager;
 
     public void setDriversDBManager(DBManager driversDBManager) {
@@ -36,7 +39,7 @@ public class DriversTabController {
         Scene scene = new Scene(root);
 
         Stage stage = new Stage();
-        stage.initOwner(null);//TODO set proper stage
+        stage.initOwner(parentStage);
         stage.initModality(Modality.WINDOW_MODAL);
 
         stage.setTitle("Zvolte časový úsek pro zobrazení přestupků");
@@ -65,7 +68,7 @@ public class DriversTabController {
         Scene scene = new Scene(root);
 
         Stage stage = new Stage();
-        stage.initOwner(null);//TODO set proper stage
+        stage.initOwner(parentStage);
         stage.initModality(Modality.WINDOW_MODAL);
 
         stage.setTitle("Zvolte město");
@@ -77,14 +80,16 @@ public class DriversTabController {
                 driversTable.setItems(Helper.transformDriverTableData(driversDBManager.getDriversWhoLostLicenseFromCity(result)));
             }
         });
-        controller.setItems(Helper.transformCitySelectorData(null));//TODO missing resultSet
+        controller.setItems(Helper.transformCitySelectorData(dbManager.getAllCities()));
         stage.showAndWait();
     }
 
     public void addDriverAction(ActionEvent actionEvent) {
     }
 
-    public void initialize(DBManager dbManager) {
+    public void initialize(DBManager dbManager, Stage parentStage) {
+        this.parentStage = parentStage;
+        this.dbManager = dbManager;
         setDriversDBManager(dbManager);
         driversTable.setItems(Helper.transformDriverTableData(driversDBManager.getDrivers()));
     }

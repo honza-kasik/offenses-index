@@ -78,8 +78,4 @@ public class DriversDBManager {
         return dbManager.executeSQL(query);
     }
 
-
-    public DBManager getDbManager() {
-        return dbManager;
-    }
 }

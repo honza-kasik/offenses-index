@@ -2,8 +2,6 @@ package cz.honzakasik.offensesindex;
 
 import cz.honzakasik.offensesindex.database.DBManager;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -49,15 +47,7 @@ public class MainWindowController extends Application implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         policemenTabController.initialize(dbManager);
-        driversTabController.initialize(dbManager);
+        driversTabController.initialize(dbManager, primaryStage);
         departmentsTabController.initialize(dbManager);
-    }
-
-
-    public void loadActualInformation(Event event) {
-    }
-
-    public void showOffensesWithinMonths(ActionEvent actionEvent) {
-
     }
 }

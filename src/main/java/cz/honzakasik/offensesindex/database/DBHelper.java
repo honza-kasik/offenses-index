@@ -14,15 +14,18 @@ public class DBHelper {
         sb.append("\n");
 
         try {
-            ResultSetMetaData rsmd = rs.getMetaData();
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                sb.append(rsmd.getColumnName(i)).append("\t");
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                sb.append(String.format("%-10s", metaData.getColumnName(i)));
             }
             sb.append("\n");
-            while (rs.next()) {//TODO generalize
-                sb.append(String.format("%-10s%-10s%-10s%3s%3s%3s",
-                        rs.getString(1), rs.getString(2), rs.getString(3),
-                        rs.getString(4), rs.getString(5), rs.getString(6))).append("\n");
+            while (rs.next()) {
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnValue = rs.getObject(i).toString();
+                    sb.append(String.format("%-10s", columnValue));
+                }
+                sb.append("\n");
             }
         } catch (SQLException e) {
             e.printStackTrace();
