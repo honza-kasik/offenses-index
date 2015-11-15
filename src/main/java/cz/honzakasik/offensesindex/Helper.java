@@ -1,8 +1,5 @@
 package cz.honzakasik.offensesindex;
 
-import cz.honzakasik.offensesindex.departments.DepartmentTableItem;
-import cz.honzakasik.offensesindex.drivers.DriverTableItem;
-import cz.honzakasik.offensesindex.policemen.PolicemanTableItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -11,8 +8,6 @@ import javafx.stage.Stage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 import static cz.honzakasik.offensesindex.database.DatabaseNames.CITY;
@@ -21,10 +16,6 @@ import static cz.honzakasik.offensesindex.database.DatabaseNames.CITY;
  * Created by Jan Kasik on 4.11.15.
  */
 public abstract class Helper {
-
-    private static Logger logger = Logger.getLogger(Helper.class.toString());
-
-
 
     public static ObservableList<String> transformCitySelectorData(ResultSet result) {
         return transformStringData(result, CITY);
