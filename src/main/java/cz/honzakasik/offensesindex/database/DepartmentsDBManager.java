@@ -2,9 +2,14 @@ package cz.honzakasik.offensesindex.database;
 
 import com.healthmarketscience.sqlbuilder.*;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
+import cz.honzakasik.offensesindex.departments.DepartmentTableItem;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.logging.Level;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 import static cz.honzakasik.offensesindex.database.DatabaseNames.DATE;
@@ -27,7 +32,7 @@ public class DepartmentsDBManager {
         eventsTable = dbManager.getEventsTable();
     }
 
-    public ResultSet getDepartments(Condition condition) {
+    public ObservableList<DepartmentTableItem> getDepartments(Condition condition) {
         String customQuery = new SelectQuery()
                 .addCustomColumns(
                         departmentsTable.findColumn(CITY),
@@ -51,10 +56,10 @@ public class DepartmentsDBManager {
                                 departmentsTable.findColumn(ID))
                 .addCondition(condition)
                 .validate().toString();
-        return dbManager.executeSQL(customQuery);
+        return transformDepartmentTableData(dbManager.executeSQL(customQuery));
     }
 
-    public ResultSet getAllDepartments() {
+    public ObservableList<DepartmentTableItem> getAllDepartments() {
         return getDepartments(BinaryCondition.EMPTY);
     }
 
@@ -65,11 +70,29 @@ public class DepartmentsDBManager {
         return dbManager.executeSQL(query);
     }
 
-    public ResultSet getDepartmentsWithinYear(int year) {
+    public ObservableList<DepartmentTableItem> getDepartmentsWithinYear(int year) {
         LocalDate start = LocalDate.ofYearDay(year, 1);
         LocalDate end = LocalDate.ofYearDay(year, start.isLeapYear() ? 366 : 365);
         return getDepartments(ComboCondition.and(
                 BinaryCondition.greaterThan(eventsTable.findColumn(DATE), start, true),
                 BinaryCondition.lessThan(eventsTable.findColumn(DATE), end, true)));
+    }
+
+    public static ObservableList<DepartmentTableItem> transformDepartmentTableData(ResultSet result) {
+        ObservableList<DepartmentTableItem> data = FXCollections.observableArrayList();
+        try {
+            while (result != null && result.next()) {
+                DepartmentTableItem item = new DepartmentTableItem(
+                        result.getString(NAME),
+                        result.getString(CITY),
+                        result.getInt(OFFENSES_COUNT),
+                        result.getInt(ID)
+                );
+                data.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 }

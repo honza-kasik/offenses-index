@@ -4,6 +4,7 @@ import cz.honzakasik.offensesindex.Helper;
 import cz.honzakasik.offensesindex.database.DBHelper;
 import cz.honzakasik.offensesindex.database.DBManager;
 import cz.honzakasik.offensesindex.database.DepartmentsDBManager;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
@@ -31,18 +32,18 @@ public class DepartmentsTabController {
     public void showOffensesWithinYearAction() {
         String text = offensesYear.getText();
         int year = Integer.valueOf(text);
-        ResultSet results = departmentsDBManager.getDepartmentsWithinYear(year);
-        if (DBHelper.isResultEmpty(results)) {
+        ObservableList<DepartmentTableItem> results = departmentsDBManager.getDepartmentsWithinYear(year);
+        if (results.isEmpty()) {
             Helper.displayNothingFoundError(parentStage);
         } else {
-            departmentTable.setItems(Helper.transformDepartmentTableData(results));
+            departmentTable.setItems(results);
         }
     }
 
     public void initialize(DBManager dbManager, Stage parentStage) {
         this.parentStage = parentStage;
         departmentsDBManager = new DepartmentsDBManager(dbManager);
-        departmentTable.setItems(Helper.transformDepartmentTableData(departmentsDBManager.getAllDepartments()));
+        departmentTable.setItems(departmentsDBManager.getAllDepartments());
         bindDepartmentValidationSupport();
     }
 

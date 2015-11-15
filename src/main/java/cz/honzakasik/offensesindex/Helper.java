@@ -63,25 +63,6 @@ public abstract class Helper {
         return data;
     }
 
-    public static ObservableList<DepartmentTableItem> transformDepartmentTableData(ResultSet result) {
-        ObservableList<DepartmentTableItem> data = FXCollections.observableArrayList();
-        try {
-            while (result != null && result.next()) {
-                DepartmentTableItem item = new DepartmentTableItem(
-                        result.getString(NAME),
-                        result.getString(CITY),
-                        result.getInt(OFFENSES_COUNT),
-                        result.getInt(ID)
-                );
-                data.add(item);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        logger.log(Level.INFO, data.toString() + "\n");
-        return data;
-    }
-
     public static void displayNothingFoundError(Stage owner) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.initOwner(owner);
