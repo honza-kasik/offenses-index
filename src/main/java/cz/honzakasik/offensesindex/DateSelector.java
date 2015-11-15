@@ -1,3 +1,8 @@
+package cz.honzakasik.offensesindex;
+
+import cz.honzakasik.offensesindex.database.DBHelper;
+import cz.honzakasik.offensesindex.database.DBManager;
+import cz.honzakasik.offensesindex.database.DriversDBManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -28,8 +33,7 @@ public class DateSelector implements Initializable {
     }
 
     public void confirmButtonAction() {
-        Dispatcher dispatcher = new Dispatcher();
-        if (dispatcher.isResultEmpty(dispatcher.getDriversFromTo(getDates()))) {
+        /*if (DBHelper.isResultEmpty(DriversDBManager.getDriversFromTo(getDates()))) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Nebyly nalezeny žádné výsledky");
             alert.setHeaderText("Pro zadané parametry nebyly nalezeny žádné výsledky!");
@@ -38,7 +42,7 @@ public class DateSelector implements Initializable {
         } else {
             result = true;
             closeDialog();
-        }
+        }*/
     }
 
     public void closeDialog() {

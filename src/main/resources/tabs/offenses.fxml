@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cz.honzakasik.offensesindex.offenses.OffensesTabController">
+    <top>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <items>
+                <Label text="From month"/>
+                <TextField fx:id="monthFrom" prefHeight="26.0" prefWidth="80.0"/>
+                <Label text="to month"/>
+                <TextField fx:id="monthTo" prefHeight="26.0" prefWidth="80.0"/>
+                <Label text="with point count equal to"/>
+                <ChoiceBox fx:id="pointCount" prefHeight="26.0" prefWidth="52.0"/>
+                <Button fx:id="showOffensesButton" defaultButton="true" mnemonicParsing="false"
+                        onAction="#showOffensesWithinMonthsAction" text="Show offenses"/>
+            </items>
+        </ToolBar>
+    </top>
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="498.0" prefViewportWidth="800.0">
+            <content>
+                <TableView fx:id="offensesTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <columns>
+                        <TableColumn prefWidth="75.0" text="Name">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="name"/>
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn prefWidth="75.0" text="Offenses count">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="offensesCount"/>
+                            </cellValueFactory>
+                        </TableColumn>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
