@@ -2,8 +2,13 @@ package cz.honzakasik.offensesindex.database;
 
 import com.healthmarketscience.sqlbuilder.*;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
+import cz.honzakasik.offensesindex.Helper;
+import cz.honzakasik.offensesindex.offenses.OffensesTableItem;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 
@@ -23,7 +28,7 @@ public class OffensesDBManager {
         eventsTable = dbManager.getEventsTable();
     }
 
-    public ResultSet getOffenses(Condition condition) {
+    public ObservableList<OffensesTableItem> getOffenses(Condition condition) {
         String query = new SelectQuery()
                 .addColumns(
                         offensesTable.findColumn(NAME))
@@ -37,14 +42,14 @@ public class OffensesDBManager {
                 .addCustomGroupings(offensesTable.findColumn(NAME))
                 .addCondition(condition)
                 .validate().toString();
-        return dbManager.executeSQL(query);
+        return transformResultToOffenseTableItemList(dbManager.executeSQL(query));
     }
 
-    public ResultSet getAllOffenses() {
+    public ObservableList<OffensesTableItem> getAllOffenses() {
         return getOffenses(BinaryCondition.EMPTY);
     }
 
-    public ResultSet getOffensesWithinMonths(int fromMonth, int toMonth) {
+    public ObservableList<OffensesTableItem> getOffensesWithinMonths(int fromMonth, int toMonth, int pointCount) {
         CustomSql monthFromColumn = new CustomSql("MONTH(" + eventsTable.findColumn(DATE).getColumnNameSQL() + ")");
         return getOffenses(ComboCondition.and()
                 .addCondition(BinaryCondition
@@ -53,5 +58,28 @@ public class OffensesDBManager {
                 .addCondition(BinaryCondition
                         .lessThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
                                 toMonth, true)));
+    }
+
+    public ObservableList<String> getDistinctOffensesCategories() {
+        String query = new SelectQuery(true)
+                .addColumns(offensesTable.findColumns(POINT_COUNT))
+                .validate().toString();
+        return Helper.transformStringData(dbManager.executeSQL(query), POINT_COUNT);
+    }
+
+    private ObservableList<OffensesTableItem> transformResultToOffenseTableItemList(ResultSet result) {
+        ObservableList<OffensesTableItem> data = FXCollections.observableArrayList();
+        try {
+            while (result != null && result.next()) {
+                OffensesTableItem item = new OffensesTableItem(
+                        result.getString(NAME),
+                        result.getInt(OFFENSES_COUNT)
+                );
+                data.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 }

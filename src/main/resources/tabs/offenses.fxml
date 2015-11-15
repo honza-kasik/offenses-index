@@ -26,8 +26,16 @@
             <content>
                 <TableView fx:id="offensesTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <columns>
-                        <TableColumn prefWidth="75.0" text="Name"/>
-                        <TableColumn prefWidth="75.0" text="Point count"/>
+                        <TableColumn prefWidth="75.0" text="Name">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="name"/>
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn prefWidth="75.0" text="Offenses count">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="offensesCount"/>
+                            </cellValueFactory>
+                        </TableColumn>
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

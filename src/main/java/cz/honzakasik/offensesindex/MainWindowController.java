@@ -53,5 +53,6 @@ public class MainWindowController extends Application implements Initializable {
         policemenTabController.initialize(dbManager);
         driversTabController.initialize(dbManager, primaryStage);
         departmentsTabController.initialize(dbManager, primaryStage);
+        offensesTabController.initialize(dbManager, primaryStage);
     }
 }

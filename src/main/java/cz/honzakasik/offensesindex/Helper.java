@@ -55,7 +55,7 @@ public abstract class Helper {
         ObservableList<String> data = FXCollections.observableArrayList();
         try {
             while (result != null && result.next()) {
-                data.add(result.getString(name));
+                data.add(result.getObject(name).toString());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -95,6 +95,10 @@ public abstract class Helper {
     public static boolean isYear(String str)
     {
         return str.matches("[1-9]\\d{3}");  //match a number starting with 1-9
+    }
+
+    public static boolean isMonth(String string) {
+        return string.matches("(0?[1-9]|1[012])");
     }
 
     public static ObservableList<PolicemanTableItem> transformPolicemenTableData(ResultSet result) {
