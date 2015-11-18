@@ -48,6 +48,8 @@ public class DriversTabController {
         stage.setTitle("Zvolte časový úsek pro zobrazení přestupků");
         stage.setScene(scene);
 
+        stage.setOnShowing(e -> controller.initialize(dbManager));
+
         stage.setOnHidden(event -> {
             if (controller.getResult())
                 driversTable.setItems(driversDBManager.getDriversFromTo(controller.getDates()));
