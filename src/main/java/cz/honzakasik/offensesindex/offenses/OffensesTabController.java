@@ -1,5 +1,6 @@
 package cz.honzakasik.offensesindex.offenses;
 
+import cz.honzakasik.offensesindex.DialogHelper;
 import cz.honzakasik.offensesindex.Helper;
 import cz.honzakasik.offensesindex.database.DBManager;
 import cz.honzakasik.offensesindex.database.OffensesDBManager;
@@ -39,7 +40,7 @@ public class OffensesTabController {
         int points = Integer.valueOf(pointCount.getValue());
         ObservableList<OffensesTableItem> data = offensesDBManager.getOffensesWithinMonths(from, to, points);
         if (data.isEmpty()) {
-            Helper.displayNothingFoundError(parentStage);
+            DialogHelper.displayNothingFoundError(parentStage);
         } else {
             offensesTable.setItems(offensesDBManager.getOffensesWithinMonths(from, to, points));
         }

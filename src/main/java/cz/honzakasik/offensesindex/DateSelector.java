@@ -31,7 +31,7 @@ public class DateSelector {
 
     public void confirmButtonAction() {
         if (driversDBManager.getDriversFromTo(getDates()).isEmpty()) {
-            Helper.displayNothingFoundError((Stage)confirmButton.getScene().getWindow());
+            DialogHelper.displayNothingFoundError((Stage)confirmButton.getScene().getWindow());
         } else {
             result = true;
             closeDialog();

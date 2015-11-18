@@ -64,7 +64,7 @@ public class OffensesDBManager {
         String query = new SelectQuery(true)
                 .addColumns(offensesTable.findColumns(POINT_COUNT))
                 .validate().toString();
-        return Helper.transformStringData(dbManager.executeSQL(query), POINT_COUNT);
+        return DBHelper.transformStringData(dbManager.executeSQL(query), POINT_COUNT);
     }
 
     private ObservableList<OffensesTableItem> transformResultToOffenseTableItemList(ResultSet result) {

@@ -85,7 +85,7 @@ public class DriversTabController {
                 driversTable.setItems(driversDBManager.getDriversWhoLostLicenseFromCity(result));
             }
         });
-        controller.setItems(Helper.transformCitySelectorData(dbManager.getAllCities()));
+        controller.setItems(dbManager.getAllCities());
         stage.showAndWait();
     }
 

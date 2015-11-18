@@ -1,5 +1,8 @@
 package cz.honzakasik.offensesindex.database;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -7,9 +10,9 @@ import java.sql.SQLException;
 /**
  * Created by Jan Kasik on 14.11.15.
  */
-public class DBHelper {
+public abstract class DBHelper {
 
-    private static String resultToString(ResultSet rs) {
+    public static String resultToString(ResultSet rs) {
         StringBuilder sb = new StringBuilder(2048);
         sb.append("\n");
 
@@ -41,5 +44,17 @@ public class DBHelper {
             e.printStackTrace();
         }
         return true;
+    }
+
+    public static ObservableList<String> transformStringData(ResultSet result, String name) {
+        ObservableList<String> data = FXCollections.observableArrayList();
+        try {
+            while (result != null && result.next()) {
+                data.add(result.getObject(name).toString());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 }

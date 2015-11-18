@@ -1,7 +1,7 @@
 package cz.honzakasik.offensesindex.departments;
 
+import cz.honzakasik.offensesindex.DialogHelper;
 import cz.honzakasik.offensesindex.Helper;
-import cz.honzakasik.offensesindex.database.DBHelper;
 import cz.honzakasik.offensesindex.database.DBManager;
 import cz.honzakasik.offensesindex.database.DepartmentsDBManager;
 import javafx.collections.ObservableList;
@@ -13,8 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
-
-import java.sql.ResultSet;
 
 /**
  * Created by Jan Kasik on 14.11.15.
@@ -34,7 +32,7 @@ public class DepartmentsTabController {
         int year = Integer.valueOf(text);
         ObservableList<DepartmentTableItem> results = departmentsDBManager.getDepartmentsWithinYear(year);
         if (results.isEmpty()) {
-            Helper.displayNothingFoundError(parentStage);
+            DialogHelper.displayNothingFoundError(parentStage);
         } else {
             departmentTable.setItems(results);
         }
