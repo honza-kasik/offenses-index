@@ -32,7 +32,6 @@ public class MainWindowController extends Application implements Initializable {
     @FXML private PolicemenTabController policemenTabController;
     @FXML private DepartmentsTabController departmentsTabController;
 
-
     public static void main(String[] args) {
         launch(args);
     }

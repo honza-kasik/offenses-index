@@ -31,7 +31,8 @@ public class OffensesDBManager {
     public ObservableList<OffensesTableItem> getOffenses(Condition condition) {
         String query = new SelectQuery()
                 .addColumns(
-                        offensesTable.findColumn(NAME))
+                        offensesTable.findColumn(NAME),
+                        offensesTable.findColumn(POINT_COUNT))
                 .addAliasedColumn(
                         FunctionCall.count().addColumnParams(eventsTable.findColumns(ID)),
                         OFFENSES_COUNT)
@@ -39,7 +40,7 @@ public class OffensesDBManager {
                         eventsTable,
                         offensesTable,
                         BinaryCondition.equalTo(eventsTable.findColumn(OFFENSE_ID), offensesTable.findColumn(ID)))
-                .addCustomGroupings(offensesTable.findColumn(NAME))
+                .addCustomGroupings(offensesTable.findColumn(NAME), offensesTable.findColumn(POINT_COUNT))
                 .addCondition(condition)
                 .validate().toString();
         return transformResultToOffenseTableItemList(dbManager.executeSQL(query));
@@ -53,11 +54,13 @@ public class OffensesDBManager {
         CustomSql monthFromColumn = new CustomSql("MONTH(" + eventsTable.findColumn(DATE).getColumnNameSQL() + ")");
         return getOffenses(ComboCondition.and()
                 .addCondition(BinaryCondition
-                        .greaterThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
+                        .greaterThan(new CustomSql(monthFromColumn),
                                 fromMonth, true))
                 .addCondition(BinaryCondition
-                        .lessThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
-                                toMonth, true)));
+                        .lessThan(new CustomSql(monthFromColumn),
+                                toMonth, true))
+                .addCondition(BinaryCondition
+                        .equalTo(offensesTable.findColumn(POINT_COUNT), pointCount)));
     }
 
     public ObservableList<String> getDistinctOffensesCategories() {

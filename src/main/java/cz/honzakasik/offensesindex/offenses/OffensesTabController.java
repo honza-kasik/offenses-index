@@ -42,7 +42,7 @@ public class OffensesTabController {
         if (data.isEmpty()) {
             DialogHelper.displayNothingFoundError(parentStage);
         } else {
-            offensesTable.setItems(offensesDBManager.getOffensesWithinMonths(from, to, points));
+            offensesTable.setItems(data);
         }
     }
 

@@ -22,9 +22,9 @@
                                 <PropertyValueFactory property="name"/>
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn id="driverAddress" fx:id="address" prefWidth="75.0" text="Bydliště">
+                        <TableColumn id="driverAddress" fx:id="city" prefWidth="75.0" text="City">
                             <cellValueFactory>
-                                <PropertyValueFactory property="address"/>
+                                <PropertyValueFactory property="city"/>
                             </cellValueFactory>
                         </TableColumn>
                         <TableColumn fx:id="offenseCount" prefWidth="75.0" text="Přestupky">

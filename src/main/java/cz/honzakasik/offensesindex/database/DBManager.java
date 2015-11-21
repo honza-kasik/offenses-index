@@ -60,8 +60,9 @@ public class DBManager {
         table.addColumn(NAME, "VARCHAR", 50).notNull();
         table.addColumn(SURNAME, "VARCHAR", 50).notNull();
         table.addColumn(DATE_OF_BIRTH, "DATE", null).notNull();
-        table.addColumn(SEX, "VARCHAR", 10).notNull();
+        table.addColumn(GENDER, "VARCHAR", 10).notNull();
         table.addColumn(CITY, "VARCHAR", 50).notNull();
+        table.addColumn(STREET, "VARCHAR", 50).notNull();
         return table;
     }
 
