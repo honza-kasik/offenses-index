@@ -19,9 +19,10 @@ abstract class DBPopulatorHelper {
                 .addCustomColumn(ID, id)
                 .addCustomColumn(NAME, NameGenerator.randomIdentifier())
                 .addCustomColumn(SURNAME, NameGenerator.randomIdentifier())
+                .addCustomColumn(STREET, NameGenerator.randomIdentifier())
                 .addCustomColumn(DATE_OF_BIRTH, DateGenerator.randomDate())
                 .addCustomColumn(CITY, CityGenerator.getRandomCity(rnd))
-                .addCustomColumn(SEX, rnd.nextInt(1) == 1 ? "muz" : "zena")
+                .addCustomColumn(GENDER, rnd.nextInt(1) == 1 ? MALE : FEMALE)
                 .validate().toString();
     }
 

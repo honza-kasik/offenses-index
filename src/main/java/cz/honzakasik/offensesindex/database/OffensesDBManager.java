@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 
@@ -31,7 +32,8 @@ public class OffensesDBManager {
     public ObservableList<OffensesTableItem> getOffenses(Condition condition) {
         String query = new SelectQuery()
                 .addColumns(
-                        offensesTable.findColumn(NAME))
+                        offensesTable.findColumn(NAME),
+                        offensesTable.findColumn(POINT_COUNT))
                 .addAliasedColumn(
                         FunctionCall.count().addColumnParams(eventsTable.findColumns(ID)),
                         OFFENSES_COUNT)
@@ -39,7 +41,7 @@ public class OffensesDBManager {
                         eventsTable,
                         offensesTable,
                         BinaryCondition.equalTo(eventsTable.findColumn(OFFENSE_ID), offensesTable.findColumn(ID)))
-                .addCustomGroupings(offensesTable.findColumn(NAME))
+                .addCustomGroupings(offensesTable.findColumn(NAME), offensesTable.findColumn(POINT_COUNT))
                 .addCondition(condition)
                 .validate().toString();
         return transformResultToOffenseTableItemList(dbManager.executeSQL(query));
@@ -49,22 +51,22 @@ public class OffensesDBManager {
         return getOffenses(BinaryCondition.EMPTY);
     }
 
-    public ObservableList<OffensesTableItem> getOffensesWithinMonths(int fromMonth, int toMonth, int pointCount) {
-        CustomSql monthFromColumn = new CustomSql("MONTH(" + eventsTable.findColumn(DATE).getColumnNameSQL() + ")");
+    public ObservableList<OffensesTableItem> getOffensesWithinMonths(LocalDate fromMonth, LocalDate toMonth, int pointCount) {
+        CustomSql monthFromColumn = new CustomSql(eventsTable.findColumn(DATE).getColumnNameSQL());
         return getOffenses(ComboCondition.and()
                 .addCondition(BinaryCondition
-                        .greaterThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
-                                fromMonth, true))
+                        .greaterThan(monthFromColumn, fromMonth, true))
                 .addCondition(BinaryCondition
-                        .lessThan(new CustomSql("MONTH(" + monthFromColumn + ")"),
-                                toMonth, true)));
+                        .lessThan(monthFromColumn, toMonth, true))
+                .addCondition(BinaryCondition
+                        .equalTo(offensesTable.findColumn(POINT_COUNT), pointCount)));
     }
 
     public ObservableList<String> getDistinctOffensesCategories() {
         String query = new SelectQuery(true)
                 .addColumns(offensesTable.findColumns(POINT_COUNT))
                 .validate().toString();
-        return Helper.transformStringData(dbManager.executeSQL(query), POINT_COUNT);
+        return DBHelper.transformStringData(dbManager.executeSQL(query), POINT_COUNT);
     }
 
     private ObservableList<OffensesTableItem> transformResultToOffenseTableItemList(ResultSet result) {

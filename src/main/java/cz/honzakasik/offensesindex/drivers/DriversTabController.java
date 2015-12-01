@@ -48,6 +48,8 @@ public class DriversTabController {
         stage.setTitle("Zvolte časový úsek pro zobrazení přestupků");
         stage.setScene(scene);
 
+        stage.setOnShowing(e -> controller.initialize(dbManager));
+
         stage.setOnHidden(event -> {
             if (controller.getResult())
                 driversTable.setItems(driversDBManager.getDriversFromTo(controller.getDates()));
@@ -83,11 +85,26 @@ public class DriversTabController {
                 driversTable.setItems(driversDBManager.getDriversWhoLostLicenseFromCity(result));
             }
         });
-        controller.setItems(Helper.transformCitySelectorData(dbManager.getAllCities()));
+        controller.setItems(dbManager.getAllCities());
         stage.showAndWait();
     }
 
-    public void addDriverAction(ActionEvent actionEvent) {
+    public void addDriverAction(ActionEvent actionEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("addDriverDialog.fxml"));
+        Parent root = loader.load();
+
+        AddDriverDialog controller = loader.getController();
+        Scene scene = new Scene(root);
+
+        Stage stage = new Stage();
+        stage.initOwner(parentStage);
+        stage.initModality(Modality.WINDOW_MODAL);
+
+        stage.setTitle("Add new driver");
+        stage.setScene(scene);
+        controller.initialize(dbManager);
+        stage.setOnHidden(e -> driversTable.setItems(driversDBManager.getDrivers()));
+        stage.showAndWait();
     }
 
     public void initialize(DBManager dbManager, Stage parentStage) {

@@ -63,11 +63,11 @@ public class DepartmentsDBManager {
         return getDepartments(BinaryCondition.EMPTY);
     }
 
-    public ResultSet getAllDepartmentsNames() {
+    public ObservableList<String> getAllDepartmentsNames() {
         String query = new SelectQuery(true)
                 .addColumns(departmentsTable.findColumns(NAME))
                 .validate().toString();
-        return dbManager.executeSQL(query);
+        return DBHelper.transformStringData(dbManager.executeSQL(query), NAME);
     }
 
     public ObservableList<DepartmentTableItem> getDepartmentsWithinYear(int year) {

@@ -11,13 +11,15 @@
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
                 <Label text="From month"/>
-                <TextField fx:id="monthFrom" prefHeight="26.0" prefWidth="80.0"/>
+                <DatePicker fx:id="dateFrom" prefHeight="26.0" prefWidth="110.0"/>
                 <Label text="to month"/>
-                <TextField fx:id="monthTo" prefHeight="26.0" prefWidth="80.0"/>
+                <DatePicker fx:id="dateTo" prefHeight="26.0" prefWidth="110.0"/>
                 <Label text="with point count equal to"/>
                 <ChoiceBox fx:id="pointCount" prefHeight="26.0" prefWidth="52.0"/>
                 <Button fx:id="showOffensesButton" defaultButton="true" mnemonicParsing="false"
                         onAction="#showOffensesWithinMonthsAction" text="Show offenses"/>
+                <Button fx:id="resetViewButton" mnemonicParsing="false"
+                        onAction="#resetViewButtonAction" text="Reset form and view"/>
             </items>
         </ToolBar>
     </top>

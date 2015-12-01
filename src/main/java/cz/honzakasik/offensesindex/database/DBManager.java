@@ -3,6 +3,7 @@ package cz.honzakasik.offensesindex.database;
 import com.healthmarketscience.sqlbuilder.*;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.*;
 import cz.honzakasik.offensesindex.database.populator.DBPopulator;
+import javafx.collections.ObservableList;
 
 import java.sql.*;
 import java.util.logging.Level;
@@ -59,8 +60,9 @@ public class DBManager {
         table.addColumn(NAME, "VARCHAR", 50).notNull();
         table.addColumn(SURNAME, "VARCHAR", 50).notNull();
         table.addColumn(DATE_OF_BIRTH, "DATE", null).notNull();
-        table.addColumn(SEX, "VARCHAR", 10).notNull();
+        table.addColumn(GENDER, "VARCHAR", 10).notNull();
         table.addColumn(CITY, "VARCHAR", 50).notNull();
+        table.addColumn(STREET, "VARCHAR", 50).notNull();
         return table;
     }
 
@@ -152,9 +154,9 @@ public class DBManager {
         return null;
     }
 
-    public ResultSet getAllCities() {
+    public ObservableList<String> getAllCities() {
         String citiesQuery = new SelectQuery(true)
                 .addCustomColumns(driversTable.findColumn(CITY)).validate().toString();
-        return executeSQL(citiesQuery);
+        return DBHelper.transformStringData(executeSQL(citiesQuery), CITY);
     }
 }

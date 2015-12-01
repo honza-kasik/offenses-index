@@ -1,30 +1,27 @@
 package cz.honzakasik.offensesindex;
 
-import cz.honzakasik.offensesindex.database.DBHelper;
 import cz.honzakasik.offensesindex.database.DBManager;
 import cz.honzakasik.offensesindex.database.DriversDBManager;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.stage.Stage;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
-import java.net.URL;
 import java.time.LocalDate;
-import java.util.ResourceBundle;
 
 /**
  * Created by Jan Kasik on 28.10.15.
  */
-public class DateSelector implements Initializable {
+public class DateSelector {
 
     @FXML private DatePicker dateFrom;
     @FXML private DatePicker dateTo;
     @FXML private Button cancelButton;
     @FXML private Button confirmButton;
 
+    private DriversDBManager driversDBManager;
     private boolean result = false;
     private ValidationSupport validationSupport = new ValidationSupport();
 
@@ -33,16 +30,12 @@ public class DateSelector implements Initializable {
     }
 
     public void confirmButtonAction() {
-        /*if (DBHelper.isResultEmpty(DriversDBManager.getDriversFromTo(getDates()))) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Nebyly nalezeny žádné výsledky");
-            alert.setHeaderText("Pro zadané parametry nebyly nalezeny žádné výsledky!");
-            alert.setContentText("Opakujte prosím akci s jinými parametry.");
-            alert.showAndWait();
+        if (driversDBManager.getDriversFromTo(getDates()).isEmpty()) {
+            DialogHelper.displayNothingFoundError((Stage)confirmButton.getScene().getWindow());
         } else {
             result = true;
             closeDialog();
-        }*/
+        }
     }
 
     public void closeDialog() {
@@ -53,8 +46,8 @@ public class DateSelector implements Initializable {
         return new LocalDate[]{dateFrom.getValue(), dateTo.getValue()};
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(DBManager dbManager) {
+        driversDBManager = new DriversDBManager(dbManager);
         validationSupport.registerValidator(dateFrom, Validator.createEmptyValidator("Je třeba vyplnit datum od!"));
         validationSupport.registerValidator(dateTo, Validator.createEmptyValidator("Je třeba vyplnit datum do!"));
         confirmButton.disableProperty().bind(validationSupport.invalidProperty());

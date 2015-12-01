@@ -10,6 +10,7 @@ public abstract class DatabaseNames {
     public static final String POINT_COUNT = "pocet_bodu";
     public static final String OFFENSES_COUNT = "pocet_prestupku";
     public static final String CITY = "mesto";
+    public static final String STREET = "ulice";
     public static final String DRIVER = "ridic";
     public static final String DRIVERS = "ridici";
     public static final String OFFENSE = "prestupek";
@@ -17,7 +18,7 @@ public abstract class DatabaseNames {
     public static final String DATE = "datum";
     public static final String EVENT = "udalost";
     public static final String EVENTS = "udalosti";
-    public static final String SEX = "pohlavi";
+    public static final String GENDER = "pohlavi";
     public static final String DATE_OF_BIRTH = "datum_narozeni";
     public static final String ID = "ID";
     public static final String DRIVER_ID = ID + "_" + DRIVER;
@@ -30,4 +31,6 @@ public abstract class DatabaseNames {
     public static final String DEPARTMENT_ID = ID + "_" + DEPARTMENT;
     public static final String POLICEMAN_ID = ID + "_" + POLICEMAN;
     public static final String DESCRIPTION = "popis";
+    public static final String MALE = "male";
+    public static final String FEMALE = "female";
 }
