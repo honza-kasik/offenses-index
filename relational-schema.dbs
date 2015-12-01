@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="Derby" id="Project_1fc5188f" html="y" template="Default" database="Derby" >
+	<schema name="APP" schemaname="APP" >
+		<table name="ODDELENI" >
+			<column name="ID" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="JMENO" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<column name="MESTO" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<index name="SQL151121101508240" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+		</table>
+		<table name="POLICISTE" >
+			<column name="ID" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="JMENO" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<column name="PRIJMENI" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<column name="CISLO" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="ID_ODDELENI" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<index name="SQL151121101508300" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="IDX_POLICISTE" unique="NORMAL" >
+				<column name="ID_ODDELENI" />
+			</index>
+			<fk name="FK_POLICISTE" to_schema="APP" to_table="ODDELENI" >
+				<fk_column name="ID_ODDELENI" pk="ID" />
+			</fk>
+		</table>
+		<table name="PRESTUPKY" >
+			<column name="ID" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="POCET_BODU" type="smallint" length="5" decimal="0" jt="5" mandatory="y" />
+			<column name="JMENO" type="varchar" length="100" decimal="0" jt="12" mandatory="y" />
+			<index name="SQL151121101508170" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+		</table>
+		<table name="RIDICI" >
+			<column name="ID" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="JMENO" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<column name="PRIJMENI" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<column name="DATUM_NAROZENI" type="date" length="10" decimal="0" jt="91" mandatory="y" />
+			<column name="POHLAVI" type="varchar" length="10" decimal="0" jt="12" mandatory="y" />
+			<column name="MESTO" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<column name="ULICE" type="varchar" length="50" decimal="0" jt="12" mandatory="y" />
+			<index name="SQL151121101508040" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+		</table>
+		<table name="UDALOSTI" >
+			<column name="ID" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="ID_PRESTUPEK" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="ID_RIDIC" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="ID_POLICISTA" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="DATUM" type="date" length="10" decimal="0" jt="91" />
+			<column name="POPIS" type="varchar" length="5000" decimal="0" jt="12" />
+			<index name="SQL151121101508110" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="IDX_UDALOSTI" unique="NORMAL" >
+				<column name="ID_PRESTUPEK" />
+			</index>
+			<index name="IDX_UDALOSTI_0" unique="NORMAL" >
+				<column name="ID_RIDIC" />
+			</index>
+			<index name="IDX_UDALOSTI_1" unique="NORMAL" >
+				<column name="ID_POLICISTA" />
+			</index>
+			<fk name="FK_UDALOSTI" to_schema="APP" to_table="PRESTUPKY" >
+				<fk_column name="ID_PRESTUPEK" pk="ID" />
+			</fk>
+			<fk name="FK_UDALOSTI_0" to_schema="APP" to_table="RIDICI" >
+				<fk_column name="ID_RIDIC" pk="ID" />
+			</fk>
+			<fk name="FK_UDALOSTI_1" to_schema="APP" to_table="POLICISTE" >
+				<fk_column name="ID_POLICISTA" pk="ID" />
+			</fk>
+		</table>
+	</schema>
+	<connector name="Derby" database="Derby" driver_class="org.apache.derby.jdbc.EmbeddedDriver" driver_jar="derby.jar" driver_desc="Local Connection" host="localhost" port="1527" instance="/home/honza/prestupky_db" />
+	<layout id="Layout_2d5e2016" name="APP" show_relation_columns="y" >
+		<entity schema="APP" name="RIDICI" color="bfd4f5" x="45" y="45" />
+		<entity schema="APP" name="PRESTUPKY" color="bfd4f5" x="90" y="300" />
+		<entity schema="APP" name="UDALOSTI" color="c8f5bf" x="315" y="135" />
+		<entity schema="APP" name="ODDELENI" color="bfd4f5" x="810" y="135" />
+		<entity schema="APP" name="POLICISTE" color="bfd4f5" x="570" y="135" />
+		<browser id="Browse_353e1364" name="ODDELENI" >
+			<browse_table schema="APP" entity="ODDELENI" x="-2147483648" y="-2147483648" width="-2147483648" height="-2147483648" />
+		</browser>
+	</layout>
+</project>
