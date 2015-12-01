@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import static cz.honzakasik.offensesindex.database.DatabaseNames.*;
 
@@ -50,15 +51,13 @@ public class OffensesDBManager {
         return getOffenses(BinaryCondition.EMPTY);
     }
 
-    public ObservableList<OffensesTableItem> getOffensesWithinMonths(int fromMonth, int toMonth, int pointCount) {
-        CustomSql monthFromColumn = new CustomSql("MONTH(" + eventsTable.findColumn(DATE).getColumnNameSQL() + ")");
+    public ObservableList<OffensesTableItem> getOffensesWithinMonths(LocalDate fromMonth, LocalDate toMonth, int pointCount) {
+        CustomSql monthFromColumn = new CustomSql(eventsTable.findColumn(DATE).getColumnNameSQL());
         return getOffenses(ComboCondition.and()
                 .addCondition(BinaryCondition
-                        .greaterThan(new CustomSql(monthFromColumn),
-                                fromMonth, true))
+                        .greaterThan(monthFromColumn, fromMonth, true))
                 .addCondition(BinaryCondition
-                        .lessThan(new CustomSql(monthFromColumn),
-                                toMonth, true))
+                        .lessThan(monthFromColumn, toMonth, true))
                 .addCondition(BinaryCondition
                         .equalTo(offensesTable.findColumn(POINT_COUNT), pointCount)));
     }
